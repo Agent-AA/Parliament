@@ -4,11 +4,23 @@ import java.io.InputStreamReader;
 
 public class ScreenWriter {
 
-    static final ScreenWriter instance = new ScreenWriter();
+    private static final ScreenWriter instance = new ScreenWriter();
 
     private ScreenWriter() {}
 
+    /**
+     * Clears the terminal screen
+     */
+    public void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    /**
+     * Prints the "Parliament" intro screen
+     */
     public void introScreen() {
+        clearScreen();
         System.out.println(" _____           _ _                            _   ");
         System.out.println("|  __ \\         | (_)                          | |  ");
         System.out.println("| |__) |_ _ _ __| |_  __ _ _ __ ___   ___ _ __ | |_ ");
