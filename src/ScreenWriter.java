@@ -4,14 +4,10 @@ import java.io.InputStreamReader;
 
 public class ScreenWriter {
 
-    private static final ScreenWriter instance = new ScreenWriter();
-
-    private ScreenWriter() {}
-
     /**
      * Clears the terminal screen
      */
-    public void clearScreen() {
+    public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
@@ -19,7 +15,7 @@ public class ScreenWriter {
     /**
      * Prints the "Parliament" intro screen
      */
-    public void introScreen() {
+    public static void introScreen() {
         clearScreen();
         System.out.println(" _____           _ _                            _   ");
         System.out.println("|  __ \\         | (_)                          | |  ");
@@ -34,7 +30,7 @@ public class ScreenWriter {
      * @param prompt String to prompt the user
      * @return String input or null if no input.
      */
-    public String readInput (String prompt) {
+    public static String readInput (String prompt) {
 
         String input = null;
 
@@ -54,9 +50,5 @@ public class ScreenWriter {
 
         // Printing the read line
         return input;
-    }
-
-    public static ScreenWriter getInstance() {
-        return instance;
     }
 }
