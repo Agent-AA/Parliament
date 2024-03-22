@@ -36,6 +36,18 @@ public class CommandParser {
         }
     };
 
+
+    // MOTION REFERENCE LIST - this array is used by several functions to
+    // look up motions.
+    @SuppressWarnings("rawtypes")
+    private static Class[] motionList = {
+        MainMotion.class
+    };
+
+    /**
+     * Displays reference information for a class of motions. Motions
+     * must be added to the motionList array in order to be referenced.
+     */
     private static Command reference = new Command("ref") {
         @SuppressWarnings("unchecked")
         public void execute(String input) {
@@ -52,12 +64,6 @@ public class CommandParser {
                 }
             }
         }
-    };
-
-    //#region Motion commands
-    @SuppressWarnings("rawtypes")
-    private static Class[] motionList = {
-        MainMotion.class
     };
 
 
