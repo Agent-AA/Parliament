@@ -72,6 +72,14 @@ public abstract class Motion {
         System.out.println("TYPE OF MOTION: " + name);
         System.out.println("TITLE: " + title);
         System.out.println("STATUS: " + status);
+
+        if (status.equals("passed") || status.equals("failed")) {
+            System.out.println("\nAFFIRMATIVE VOTES: " + yesVotes);
+            System.out.println("NEGATIVE VOTES: " + noVotes);
+            System.out.println("PRESENT VOTES: " + presentVotes);
+            System.out.println("ABSENT VOTES: " + absentVotes);
+        }
+
         System.out.println("\n" + motionText);
     }
 
