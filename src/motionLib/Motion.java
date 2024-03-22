@@ -15,7 +15,7 @@ public abstract class Motion {
         session,
         title, // the title of the specific motion
         status, // pending, tabled, passed, failed
-        motionText; // contains the text of the specific motion
+        motionText; // the citation for the motion in Robert's Rules of Order
 
     protected int motionID, yesVotes, noVotes, presentVotes, absentVotes;
 
@@ -23,7 +23,8 @@ public abstract class Motion {
         name, // the name of the general motion
         summary, // a brief statement of the motion's purpose
         description, // describes the purpose and function of a class of motion
-        motionType; // main, subsidiary, privileged, incidental, requestionary
+        motionType, // main, subsidiary, privileged, incidental, requestionary
+        citation; // the citation for the motion in Robert's Rules of Order
 
     protected static boolean
         amendable,
@@ -90,6 +91,26 @@ public abstract class Motion {
         return name;
     }
 
+    /**
+     * Displays reference information for a motion.
+     */
+    public static void reference() {
+        ScreenWriter.clearScreen();
+
+        System.out.println(
+            "\nNAME: " + name +
+            "\nSUMMARY: " + summary +
+            "\n\nTYPE: " + motionType +
+            "\nSECOND NEEDED: " + secondNeeded +
+            "\nDEBATABLE: " + debatable +
+            "\nAMENDABLE: " + amendable +
+            "\nVOTE NEEDED: " + majorityNeeded +
+            "\nRECONSIDERABLE: " + reconsiderable +
+            "\n\nPRECEDENT: " + precedent +
+            "\n\n" + description +
+            "\n" + citation
+        );
+    }
 
     /**
      * Saves the motion to a file in the session's directory.
@@ -148,7 +169,5 @@ public abstract class Motion {
      * Actions to take when a motion passes
      */
     public abstract void pass();
-
-    public abstract void reference();
 
 }

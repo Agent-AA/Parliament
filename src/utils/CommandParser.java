@@ -51,13 +51,13 @@ public class CommandParser {
      */
     private static Command reference = new Command("ref") {
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "static-access" })
         public void execute(String input) {
 
             // if the user has not specified a motion with the reference command,
             // list all motions
             if (input.split(" ").length < 2) {
-                System.out.println("\n\nAll motions: \n");
+                System.out.println("\n\nAll motions: ");
                 for (Class<Motion> motion : motionList) {
                     try {
                         Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,"");
@@ -74,7 +74,7 @@ public class CommandParser {
                     try {
                         Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
                     if (input.split(" ")[1].equals(motionInstance.getMotionName())) { // Call getMotionName() on the instance
-                        motionInstance.reference();
+                        motionInstance.reference(); // there is unfortunately no way to call reference statically like this
                         return;
                         }
                     } catch (Exception e) {
