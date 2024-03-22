@@ -23,11 +23,13 @@ public class CommandParser {
         public void execute(String input) {
             System.out.println("""
 
-                    Commands:
+                    [] denotes arguments
 
-                    help     exit
-                    ref
-                """);
+                    Name     Description
+                    ----     -----------
+                    exit     Exit the program
+                    help     Display this message
+                    ref[]    Reference a type of motion""");
             }
         };
 

@@ -19,7 +19,7 @@ public class Main {
         }
 
         while (true) {
-            CommandParser.parseCommand(ScreenWriter.readInput("\nWhat would you like to do?: "));
+            CommandParser.parseCommand(ScreenWriter.readInput("\n"+ sessionName + "> "));
         }
     }
 }
