@@ -1,5 +1,4 @@
 import utils.CommandParser;
-import utils.FileManager;
 import utils.MotionTracker;
 import utils.ScreenWriter;
 
@@ -13,7 +12,7 @@ public class Main {
         MotionTracker.getInstance().setSession(sessionName);
         MotionTracker.getInstance().bufferMotions();
 
-        if (FileManager.createDir(sessionName, "./files/")) {
+        if (MotionTracker.createDir(sessionName, "./files/")) {
             System.out.println("\n" + sessionName + " session successfully created.");
         } else {
             System.out.println("\n" + sessionName + " session opened.");

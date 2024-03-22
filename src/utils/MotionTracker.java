@@ -17,16 +17,8 @@ public class MotionTracker {
 
     private MotionTracker() {}
 
-    public static MotionTracker getInstance() {
-        return instance;
-    }
-
     public void addMotion(Motion motion)  {
         motionStack.add(motion);
-    }
-
-    public void setSession(String sessionName) {
-        this.sessionName = sessionName;
     }
 
     public void bufferMotions() {
@@ -75,5 +67,26 @@ public class MotionTracker {
             m.display();
         }
 
+    }
+
+    /**
+     * Creates a new directory
+     * @param name String the file's name
+     * @param path String the file's path
+     * @return boolean: true if the directory was created, false if it already exists
+     */
+    public static boolean createDir(String name, String path) {
+
+        File f = new File(path + name);
+
+        return f.mkdir();
+    }
+
+    public static MotionTracker getInstance() {
+        return instance;
+    }
+
+    public void setSession(String sessionName) {
+        this.sessionName = sessionName;
     }
 }
