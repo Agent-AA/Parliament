@@ -26,6 +26,7 @@ public class CommandParser {
                     Commands:
 
                     help     exit
+                    ref
                 """);
             }
         };
@@ -49,19 +50,36 @@ public class CommandParser {
      * must be added to the motionList array in order to be referenced.
      */
     private static Command reference = new Command("ref") {
+
         @SuppressWarnings("unchecked")
         public void execute(String input) {
-            for (Class<Motion> motion : motionList) {
-                try {
-                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
-                if (input.split(" ")[1].equals(motionInstance.getMotionName())) { // Call getMotionName() on the instance
-                    motionInstance.reference(); // Call reference() on the instance
-                    return;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
 
+            // if the user has not specified a motion with the reference command,
+            // prompt them to do so.
+            if (input.split(" ").length < 2) {
+                System.out.println("\nPlease specify a motion to reference.");
+                return;
+
+            // if the user HAS specified a motion, search the motionList and disply it for them
+            } else if (input.split(" ").length == 2) {
+                for (Class<Motion> motion : motionList) {
+                    try {
+                        Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
+                    if (input.split(" ")[1].equals(motionInstance.getMotionName())) { // Call getMotionName() on the instance
+                        motionInstance.reference();
+                        return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                    }
                 }
+                return;
+
+            // if the user has specified too many arguments, prompt them to specify only one
+            } else {
+                System.out.println("\nInvalid arguments: the ref command only accepts one argument.");
+                return;
             }
         }
     };
