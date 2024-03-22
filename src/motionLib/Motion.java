@@ -101,7 +101,6 @@ public abstract class Motion {
      * Displays reference information for a motion.
      */
     public static void reference() {
-        ScreenWriter.clearScreen();
 
         System.out.println(
             "\nNAME: " + name +
