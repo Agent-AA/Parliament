@@ -55,9 +55,17 @@ public class CommandParser {
         public void execute(String input) {
 
             // if the user has not specified a motion with the reference command,
-            // prompt them to do so.
+            // list all motions
             if (input.split(" ").length < 2) {
-                System.out.println("\nPlease specify a motion to reference.");
+                System.out.println("\n\nAll motions: \n");
+                for (Class<Motion> motion : motionList) {
+                    try {
+                        Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,"");
+                        System.out.println(motionInstance.getMotionName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 return;
 
             // if the user HAS specified a motion, search the motionList and disply it for them
