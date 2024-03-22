@@ -1,4 +1,4 @@
-import motionLib.MainMotion;
+import utils.CommandParser;
 import utils.FileManager;
 import utils.MotionTracker;
 import utils.ScreenWriter;
@@ -19,7 +19,8 @@ public class Main {
             System.out.println("\n" + sessionName + " session opened.");
         }
 
-        MainMotion motion = new MainMotion(("A motion to introduce a new system of government"), "We want to form a new government", 1, sessionName);
-        motion.save();
+        while (true) {
+            CommandParser.parseCommand(ScreenWriter.readInput("\nWhat would you like to do?: "));
+        }
     }
 }
