@@ -17,8 +17,14 @@ public abstract class Motion {
         status, // pending, tabled, passed, failed
         motionText; // the citation for the motion in Robert's Rules of Order
 
-    protected int motionID, yesVotes, noVotes, presentVotes, absentVotes;
+    protected int motionID,
+        // all motions start with no votes
+        yesVotes = 0,
+        noVotes = 0,
+        presentVotes = 0,
+        absentVotes = 0;
 
+    // Static values are associated with a general class of motions rather than particular instances
     protected static String
         name, // the name of the general motion
         summary, // a brief statement of the motion's purpose
@@ -120,7 +126,19 @@ public abstract class Motion {
 
         try {
             FileWriter fw = new FileWriter(file);
-            fw.write("TITLE: " + title + "\nTYPE OF MOTION: " + name + "\nSTATUS: " + status + "\n\nAFFIRMATIVE VOTES: " + yesVotes + "\nNEGATIVE VOTES: " + noVotes + "\nPRESENT VOTES: " + presentVotes + "\nABSENT VOTES: " + absentVotes + "\n\nTEXT: " + motionText);
+            fw.write(
+                "TITLE: " + title +
+                "\nTYPE OF MOTION: " + name +
+                "\nSTATUS: " + status +
+
+                "\n\nAFFIRMATIVE VOTES: " + yesVotes +
+                "\nNEGATIVE VOTES: " + noVotes +
+                "\nPRESENT VOTES: " + presentVotes +
+                "\nABSENT VOTES: " + absentVotes +
+
+                "\n\nTEXT: " + motionText
+            );
+
             fw.close();
         } catch (Exception e) {
             e.printStackTrace();
