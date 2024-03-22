@@ -13,7 +13,7 @@ public class MotionTracker {
     private static MotionTracker instance = new MotionTracker();
     private ArrayList<Motion> motionStack = new ArrayList<Motion>();
     private String sessionName;
-    private int motionCount = 1;
+    private static int motionCount = 1;
 
     private MotionTracker() {}
 
@@ -23,11 +23,9 @@ public class MotionTracker {
 
     public void bufferMotions() {
         while (true) {
-            File file = new File("./files/" + sessionName + "-" + motionCount + ".mtn");
-
+            File file = new File("./files/" + sessionName + "/" + sessionName + "-" + motionCount + ".mtn");
             // if the file doesn't exist, the MotionTracker stops here. Otherwise, continues
-            if (!file.exists()) {break;}
-
+            if (!file.isFile()) {break;}
             // Read the file and "upload" a motion object
             try {
                 Scanner s = new Scanner(file);
@@ -49,8 +47,8 @@ public class MotionTracker {
                 Class motionClass = Class.forName("motionLib." + motionType.replaceAll(" ", ""));
 
                 @SuppressWarnings("unchecked")
-                Motion motion = (Motion) motionClass.getConstructor(String.class, String.class, int.class, String.class)
-                    .newInstance(title, motionText, sessionName, status, motionCount, sessionName, yesVotes, noVotes, presentVotes, absentVotes);
+                Motion motion = (Motion) motionClass.getConstructor(String.class, String.class, int.class, String.class, String.class, int.class, int.class, int.class, int.class)
+                    .newInstance(title, motionText, motionCount, sessionName, status, yesVotes, noVotes, presentVotes, absentVotes);
 
                 motionStack.add(motion);
 
@@ -62,11 +60,6 @@ public class MotionTracker {
 
             motionCount++;
         }
-
-        for (Motion m: motionStack) {
-            m.display();
-        }
-
     }
 
     /**
@@ -84,6 +77,12 @@ public class MotionTracker {
 
     public static MotionTracker getInstance() {
         return instance;
+    }
+
+    // We have to do this in reverse order because the return will end the method
+    public static int getNextID() {
+        motionCount++;
+        return motionCount - 1;
     }
 
     public void setSession(String sessionName) {

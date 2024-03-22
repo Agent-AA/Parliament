@@ -26,7 +26,8 @@ public abstract class Motion {
 
     // Static values are associated with a general class of motions rather than particular instances
     protected static String
-        name, // the name of the general motion
+        name, // the name of the general motion. This MUST be the same as the class name sans spaces.
+        shortName, // a shortened version of the motion name used for commands. Usually omits the "motion to" part
         summary, // a brief statement of the motion's purpose
         description, // describes the purpose and function of a class of motion
         motionType, // main, subsidiary, privileged, incidental, requestionary
@@ -93,8 +94,8 @@ public abstract class Motion {
     /**
      * Returns the name of a motion class
      */
-    public String getMotionName() {
-        return name;
+    public String getShortName() {
+        return shortName;
     }
 
     /**

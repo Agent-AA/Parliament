@@ -16,7 +16,8 @@ public class MainMotion extends Motion {
 
     @Override
     public void setStaticValues() { // static values are set in this function rather than the constructor
-        name = "main";
+        name = "Main Motion";
+        shortName = "main";
         summary = "Bring new business before the assembly";
         description = """
             A main motion is a motion that brings business before the assembly. Main motions

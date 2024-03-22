@@ -1,12 +1,19 @@
 package commands;
 
 import motionLib.*;
+import utils.MotionTracker;
 import utils.ScreenWriter;
 
 /**
  * Static utility class that interprets commands from the user.
  */
 public class CommandParser {
+
+    private static String session;
+
+    public static void setSession(String session) {
+        CommandParser.session = session;
+    }
 
     //#region help command
     private static Command help = new Command("help") {
@@ -19,6 +26,7 @@ public class CommandParser {
                     ----     -----------
                     exit     Exit the program
                     help     Display this message
+                    intro[]  Introduce a new motion
                     ref[]    Reference a type of motion""");
             }
         };
@@ -32,6 +40,46 @@ public class CommandParser {
     };
     //#endregion
 
+    //#region intro command
+    // Introduce a motion
+    private static Command intro = new Command("intro") {
+        @SuppressWarnings("unchecked")
+        public void execute(String input) {
+
+            // Check if there is the correct number of arguments
+            if (input.split(" ").length < 2) {
+                System.out.println("\nInvalid arguments: the intro command requires a motion type as an argument.");
+                return;
+            } else if (input.split(" ").length > 2) {
+                System.out.println("\nInvalid arguments: the intro command only accepts one argument.");
+                return;
+            }
+
+            // Get input
+            String motionType = input.split(" ")[1];
+            String motionTitle = ScreenWriter.readInput("\nMotion title: ");
+            String motionText = ScreenWriter.readInput("\nMotion text:\n\n");
+
+            // Determine the motion type and save if there is one
+            for (Class<Motion> motion : motionList) {
+                try {
+                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance(motionTitle,motionText,MotionTracker.getNextID(),session); // Create an instance of the Motion class
+                if (motionType.equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
+                    motionInstance.save(); // there is unfortunately no way to call reference statically like this
+                    System.out.println("\nMotion successfully created.");
+                    return;
+                    } else {
+                        System.out.println("\nInvalid motion type.");
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    };
+    //#endregion
 
     // MOTION REFERENCE LIST - this array is used by several functions to
     // look up motions.
@@ -57,7 +105,7 @@ public class CommandParser {
                 for (Class<Motion> motion : motionList) {
                     try {
                         Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,"");
-                        System.out.println(motionInstance.getMotionName());
+                        System.out.println(motionInstance.getShortName());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -69,7 +117,7 @@ public class CommandParser {
                 for (Class<Motion> motion : motionList) {
                     try {
                         Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
-                    if (input.split(" ")[1].equals(motionInstance.getMotionName())) { // Call getMotionName() on the instance
+                    if (input.split(" ")[1].equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
                         motionInstance.reference(); // there is unfortunately no way to call reference statically like this
                         return;
                         }
@@ -92,8 +140,9 @@ public class CommandParser {
     //#region commandParsing
     // This is the array of commands that the parseCommand method uses
     private static Command[] commandList = {
-        help,
         exit,
+        help,
+        intro,
         reference
     };
 
