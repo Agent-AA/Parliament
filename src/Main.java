@@ -1,4 +1,4 @@
-import utils.CommandParser;
+import commands.CommandParser;
 import utils.MotionTracker;
 import utils.ScreenWriter;
 
