@@ -4,9 +4,17 @@ import utils.ScreenWriter;
 
 public class MainMotion extends Motion {
 
-    public MainMotion(String title, String motionText, int motionID) {
-        super(title, motionText, motionID);
+    public MainMotion(String title, String motionText, int motionID, String session) {
+        super(title, motionText, motionID, session);
     }
+
+    // Overloaded constructor for loading motions from files that already have a status and votes
+    public MainMotion(String title, String motionText, int motionID, String session, String status, int yesVotes, int noVotes, int presentVotes, int absentVotes) {
+        super(title, motionText, motionID, session, status, yesVotes, noVotes, presentVotes, absentVotes);
+    }
+
+    @Override
+    public void pass() {}
 
     @Override
     public void setStaticValues() {
