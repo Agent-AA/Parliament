@@ -1,4 +1,8 @@
 package utils;
+
+import motionLib.MainMotion;
+import motionLib.Motion;
+
 /**
  * Static utility class that interprets commands from the user.
  */
@@ -32,20 +36,43 @@ public class CommandParser {
         }
     };
 
+    private static Command reference = new Command("ref") {
+        @SuppressWarnings("unchecked")
+        public void execute(String input) {
+            for (Class<Motion> motion : motionList) {
+                try {
+                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
+                if (input.split(" ")[1].equals(motionInstance.getMotionName())) { // Call getMotionName() on the instance
+                    motionInstance.reference(); // Call reference() on the instance
+                    return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
 
+                }
+            }
+        }
+    };
+
+    //#region Motion commands
+    @SuppressWarnings("rawtypes")
+    private static Class[] motionList = {
+        MainMotion.class
+    };
 
 
     // This is the array of commands that the parseCommand method uses
-    private static Command[] commands = {
+    private static Command[] commandList = {
         help,
-        exit
+        exit,
+        reference
     };
 
     // The quintessential method for receiving and interpreting commands. This should never be touched
     public static void parseCommand(String input) {
 
         ScreenWriter.introScreen();
-        for (Command cmd : commands) {
+        for (Command cmd : commandList) {
             if (input.split(" ")[0].equals(cmd.keyword)) {
                 cmd.execute(input);
                 return;

@@ -75,6 +75,13 @@ public abstract class Motion {
         System.out.println("\n" + motionText);
     }
 
+    /**
+     * Returns the name of a motion class
+     */
+    public String getMotionName() {
+        return name;
+    }
+
 
     /**
      * Saves the motion to a file in the session's directory.
@@ -133,5 +140,7 @@ public abstract class Motion {
      * Actions to take when a motion passes
      */
     public abstract void pass();
+
+    public abstract void reference();
 
 }

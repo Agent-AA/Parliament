@@ -18,7 +18,7 @@ public class MainMotion extends Motion {
 
     @Override
     public void setStaticValues() {
-        name = "Main Motion";
+        name = "main";
         summary = "Bring new business before the assembly";
         description = """
             A main motion is a motion that brings business before the assembly. Main motions
@@ -40,7 +40,7 @@ public class MainMotion extends Motion {
     /**
      * Prints a reference sheet for the motion to the screen.
      */
-    public static void reference() {
+    public void reference() {
         ScreenWriter.clearScreen();
 
         System.out.println("""
