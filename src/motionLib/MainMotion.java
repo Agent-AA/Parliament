@@ -12,6 +12,9 @@ public class MainMotion extends Motion {
     }
 
     @Override
+    public void introduce() {}
+    
+    @Override
     public void pass() {}
 
     @Override

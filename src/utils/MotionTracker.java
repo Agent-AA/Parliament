@@ -1,6 +1,7 @@
 package utils;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import motionLib.Motion;
@@ -11,7 +12,7 @@ import motionLib.Motion;
 public class MotionTracker {
 
     private static MotionTracker instance = new MotionTracker();
-    private ArrayList<Motion> motionStack = new ArrayList<Motion>();
+    private static ArrayList<Motion> motionStack = new ArrayList<Motion>();
     private String sessionName;
     private static int motionCount = 1;
 
@@ -83,6 +84,20 @@ public class MotionTracker {
     public static int getNextID() {
         motionCount++;
         return motionCount - 1;
+    }
+
+    /**
+     * Lists all motions in the current session
+     */
+    public static void listMotions() {
+        System.out.println("\nMotions in this session:\n");
+
+        // we flip the stack so the most recent motions are first
+        Collections.reverse(motionStack);
+        for (Motion motion : motionStack) {
+            System.out.println("#" + motion.getMotionID() + " " + motion.getTitle() + " (" + motion.getStatus() + ")");
+        }
+        Collections.reverse(motionStack);
     }
 
     public void setSession(String sessionName) {

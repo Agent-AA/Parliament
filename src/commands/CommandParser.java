@@ -24,6 +24,7 @@ public class CommandParser {
 
                     Name     Description
                     ----     -----------
+                    (enter)  List all motions for the session
                     exit     Exit the program
                     help     Display this message
                     intro[]  Introduce a new motion
@@ -65,6 +66,7 @@ public class CommandParser {
                 try {
                     Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance(motionTitle,motionText,MotionTracker.getNextID(),session); // Create an instance of the Motion class
                 if (motionType.equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
+                    motionInstance.introduce(); // take any additional actions that the motion requires
                     motionInstance.save(); // there is unfortunately no way to call reference statically like this
                     System.out.println("\nMotion successfully created.");
                     return;
@@ -77,6 +79,14 @@ public class CommandParser {
                 }
             }
 
+        }
+    };
+    //#endregion
+
+    //#region list command
+    private static Command list = new Command("") {
+        public void execute(String input) {
+            MotionTracker.listMotions();
         }
     };
     //#endregion
@@ -143,6 +153,7 @@ public class CommandParser {
         exit,
         help,
         intro,
+        list,
         reference
     };
 

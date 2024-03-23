@@ -92,10 +92,34 @@ public abstract class Motion {
     }
 
     /**
+     *
+     * @return int motion's id
+     */
+    public int getMotionID() {
+        return motionID;
+    }
+
+    /**
+     *
+     * @return String motion's title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
      * Returns the name of a motion class
      */
     public String getShortName() {
         return shortName;
+    }
+
+    /**
+     *
+     * @return the motion's status
+     */
+    public String getStatus() {
+        return status;
     }
 
     /**
@@ -182,6 +206,11 @@ public abstract class Motion {
         }
     }
 
+    /**
+     * Actions to take when a motion is first introduced. This is
+     * used for things like assigning which motion a subsidiary affects.
+     */
+    public abstract void introduce();
 
     /**
      * Actions to take when a motion passes
