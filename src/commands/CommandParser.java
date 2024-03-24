@@ -91,6 +91,37 @@ public class CommandParser {
     };
     //#endregion
 
+    //#region disp command
+    private static Command disp = new Command("disp") {
+
+        public void execute(String input) {
+
+            // Because the name can contain spaces, we can't split by spaces like normal
+            String motionIDOrName = input.split("disp ")[1];
+
+            // If the user has entered a number, display the motion with that ID.
+            // We have to check because if it's not a number, Integer.parseInt will complain about it.
+            if (motionIDOrName.matches("[0-9]+")) {
+
+                for (Motion motion : MotionTracker.getMotionStack()) {
+                    if (motion.getMotionID() == Integer.parseInt(motionIDOrName)) {
+                        motion.display();
+                        return;
+                    }
+                }
+                return;
+            } else { // we presume that otherwise the user has entered a name
+                for (Motion motion : MotionTracker.getMotionStack()) {
+                    if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase())) {
+                        motion.display();
+                        return;
+                    }
+                }
+            }
+        }
+    };
+    //#endregion
+
     // MOTION REFERENCE LIST - this array is used by several functions to
     // look up motions.
     @SuppressWarnings("rawtypes")
@@ -150,6 +181,7 @@ public class CommandParser {
     //#region commandParsing
     // This is the array of commands that the parseCommand method uses
     private static Command[] commandList = {
+        disp,
         exit,
         help,
         intro,

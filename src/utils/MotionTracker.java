@@ -80,6 +80,10 @@ public class MotionTracker {
         return instance;
     }
 
+    public static ArrayList<Motion> getMotionStack() {
+        return motionStack;
+    }
+
     // We have to do this in reverse order because the return will end the method
     public static int getNextID() {
         motionCount++;
