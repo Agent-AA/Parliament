@@ -25,10 +25,11 @@ public class CommandParser {
                     Name     Description
                     ----     -----------
                     (enter)  List all motions for the session
+                    disp[]   Display a motion by entering its ID or name
                     exit     Exit the program
                     help     Display this message
-                    intro[]  Introduce a new motion
-                    ref[]    Reference a type of motion""");
+                    intro[]  Introduce a new motion; enter its type
+                    ref[]    Reference a type of motion; enter its type""");
             }
         };
     //#endregion
