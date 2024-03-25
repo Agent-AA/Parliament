@@ -190,6 +190,32 @@ public abstract class Motion {
         Collections.reverse(motionList);
     }
 
+    public static Motion lookUpMotion(String motionIDOrName) {
+
+        // If the user has entered a number, display the motion with that ID.
+        // We have to check because if it's not a number, Integer.parseInt will complain about it.
+        if (motionIDOrName.matches("[0-9]+")) {
+
+            for (Motion motion : Motion.getMotionList()) {
+                if (motion.getMotionID() == Integer.parseInt(motionIDOrName)) {
+                    return motion;
+                }
+            }
+        } else { // we presume that otherwise the user has entered a name
+            for (Motion motion : Motion.getMotionList()) {
+                if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase())) {
+                    return motion;
+                }
+            }
+        }
+
+        /* if neither of those work for some weird reason. This should only happen if the user
+         gives bad input */
+        System.out.println("Motion not found");
+        Motion.decrementMotionCount(); // we don't want to increment the motion count if we're just passing a dummy motion
+        return new MainMotion(); // TODO make a better error handling solution
+    }
+
     /**
      * Displays reference information for a motion.
      */

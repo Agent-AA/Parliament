@@ -88,34 +88,19 @@ public class CommandParser {
 
         public void execute(String input) {
 
-            // Because the name can contain spaces, we can't split by spaces like normal
-            String motionIDOrName = input.split("disp ")[1];
+            String motionIDOrName = input.split(" ")[1];
 
-            // If the user has entered a number, display the motion with that ID.
-            // We have to check because if it's not a number, Integer.parseInt will complain about it.
-            if (motionIDOrName.matches("[0-9]+")) {
+            // Look up the motion
+            Motion motion = Motion.lookUpMotion(motionIDOrName);
 
-                for (Motion motion : Motion.getMotionList()) {
-                    if (motion.getMotionID() == Integer.parseInt(motionIDOrName)) {
-                        motion.display();
-                        return;
-                    }
-                }
-                return;
-            } else { // we presume that otherwise the user has entered a name
-                for (Motion motion : Motion.getMotionList()) {
-                    if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase())) {
-                        motion.display();
-                        return;
-                    }
-                }
-            }
+            // Display the motion
+            motion.display();
         }
     };
     //#endregion
 
-    // MOTION REFERENCE LIST - this array is used by several functions to
-    // look up motions.
+    /* MOTION REFERENCE LIST - this array is used by several functions to
+       look up motions */
     @SuppressWarnings("rawtypes")
     private static Class[] motionList = {
         MainMotion.class
@@ -180,7 +165,7 @@ public class CommandParser {
         help,
         intro,
         list,
-        reference
+        reference,
     };
 
     // The quintessential method for receiving and interpreting commands. This should never be touched
