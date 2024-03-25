@@ -4,21 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 
+import utils.ReaderWriter;
+
 public class MainMotion extends Motion {
-
-    public MainMotion(String title, String motionText) {
-        super(title, motionText);
-    }
-
-    // Overloaded constructor for loading motions from files that already have a status and votes
-    public MainMotion() {
-        super();
-    }
-
-    // Dummy constructor so we can make instances without triggering getNextID()
-    public MainMotion(int a) {
-        super(a);
-    }
 
     @Override
     public void setStaticValues() { // static values are set in this function rather than the constructor
@@ -68,7 +56,10 @@ public class MainMotion extends Motion {
     }
 
     @Override
-    public void introduce() {}
+    public void introduce() {
+        title = ReaderWriter.readInput("\nMotion Title: ");
+        motionText = ReaderWriter.readInput("\nMotion Text:\n\n");
+    }
 
     @Override
     public void pass() {}

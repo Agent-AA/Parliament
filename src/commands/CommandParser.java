@@ -50,15 +50,13 @@ public class CommandParser {
                 return;
             }
 
-            // Get input
+            // Get motion type
             String motionType = input.split(" ")[1];
-            String motionTitle = ReaderWriter.readInput("\nMotion title: ");
-            String motionText = ReaderWriter.readInput("\nMotion text:\n\n");
 
             // Determine the motion type and save if there is one
             for (Class<Motion> motion : motionList) {
                 try {
-                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class).newInstance(motionTitle,motionText); // Create an instance of the Motion class
+                    Motion motionInstance = motion.getDeclaredConstructor().newInstance(); // Create an instance of the Motion class
                 if (motionType.equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
                     motionInstance.introduce(); // take any additional actions that the motion requires
                     motionInstance.save(); // there is unfortunately no way to call reference statically like this

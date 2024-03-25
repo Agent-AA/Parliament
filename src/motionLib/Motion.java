@@ -48,23 +48,11 @@ public abstract class Motion {
 
     protected static int precedent;
 
-    public Motion(String title, String motionText) {
-        this.title = title;
-        this.motionText = motionText;
-        status = "pending";
-
-        motionID = getNextID();
-        setStaticValues();
-    }
-
-    // Overloaded constructor for loading motions from files that already have a status
     public Motion() {
+        status = "pending"; // we could technically declare this at initialization, but it's better to keep everything together
         motionID = getNextID();
         setStaticValues();
     }
-
-    // this is a dummy constructor to let us create temporary motions without trigger getNextID()
-    public Motion(int a) {}
 
     /**
      * Adds a motion to the list of motions in this session
