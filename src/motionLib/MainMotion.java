@@ -89,6 +89,9 @@ public class MainMotion extends Motion {
             e.printStackTrace();
         }
 
-        Motion.addMotionToList(this);
+        // Add the motion to the list of motions if it's not already there
+        if (!Motion.getMotionList().contains(this)) {
+            Motion.addMotionToList(this);
+        }
     }
 }

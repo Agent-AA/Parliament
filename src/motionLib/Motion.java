@@ -259,13 +259,34 @@ public abstract class Motion {
     /**
      * Records the votes for a motion, determines pass/fail, and updates the status.
      * Technically, present and absent votes don't matter, but they're recorded anyway.
-     * @param votes [0] yes, [1] no, [2] present, [3] absent
+     * @param votes String that should contain the votes; e.g., "10 24 3 2"
      */
-    public void vote(int ... votes) {
-        yesVotes = votes[0];
-        noVotes = votes[1];
-        presentVotes = votes[2];
-        absentVotes = votes[3];
+    public void vote(String votes) {
+
+        // Parse the votes
+        String[] voteArray = votes.split(" ");
+
+        // Check for the appropriate number of votes entered
+        if (voteArray.length < 2) {
+            System.out.println("Invalid Arguments: must enter at least two vote quantities: yes and no");
+            return;
+
+        } else if (voteArray.length > 4) {
+            System.out.println("Invalid Arguments: too many vote quantities entered");
+            return;
+
+        } else if (voteArray.length >= 2) {
+            yesVotes = Integer.parseInt(voteArray[0]);
+            noVotes = Integer.parseInt(voteArray[1]);
+        }
+
+        if (voteArray.length >= 3) {
+            presentVotes = Integer.parseInt(voteArray[2]);
+        }
+
+        if (voteArray.length == 4) {
+            absentVotes = Integer.parseInt(voteArray[3]);
+        }
 
         // Check if the motion passed. It passes with either a majority or a supermajority, whichever necessary
         if ((majorityNeeded && yesVotes > noVotes) || (superMajorityNeeded && yesVotes > (yesVotes + noVotes) * 2 / 3)) {

@@ -99,6 +99,26 @@ public class CommandParser {
     };
     //#endregion
 
+    //#region vote command
+    private static Command vote = new Command("vote") {
+
+        public void execute(String input) {
+
+                String motionIDOrName = input.split(" ")[1];
+
+                // Look up the motion
+                Motion motion = Motion.lookUpMotion(motionIDOrName);
+
+                // Display the motion
+                motion.display();
+
+                String votes = ReaderWriter.readInput("\nEnter votes: ");
+
+                motion.vote(votes);
+                motion.save();
+        }
+    };
+
     /* MOTION REFERENCE LIST - this array is used by several functions to
        look up motions */
     @SuppressWarnings("rawtypes")
@@ -166,6 +186,7 @@ public class CommandParser {
         intro,
         list,
         reference,
+        vote
     };
 
     // The quintessential method for receiving and interpreting commands. This should never be touched
