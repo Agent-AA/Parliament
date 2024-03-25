@@ -1,24 +1,29 @@
 package motionLib;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
 
-import utils.ScreenWriter;
-import utils.MotionTracker;
+import utils.ReaderWriter;
 
 /**
  * Represents a motion that can be made in a session;
  */
 public abstract class Motion {
 
+    // These are associated ONLY with the Motion class and not its subclasses
+    private static ArrayList<Motion> motionList = new ArrayList<Motion>();
+    protected static String session;
+    private static int motionCount = 1;
+
     protected String
-        session,
         title, // the title of the specific motion
         status, // pending, tabled, passed, failed
         motionText; // the citation for the motion in Robert's Rules of Order
 
     protected int motionID,
-        // all motions start with no votes
+        // all motions start with zero votes
         yesVotes = 0,
         noVotes = 0,
         presentVotes = 0,
@@ -43,38 +48,85 @@ public abstract class Motion {
 
     protected static int precedent;
 
-    public Motion(String title, String motionText, int motionID, String session) {
+    public Motion(String title, String motionText) {
         this.title = title;
         this.motionText = motionText;
-        this.motionID = motionID;
-        this.session = session;
         status = "pending";
 
+        motionID = getNextID();
         setStaticValues();
     }
 
     // Overloaded constructor for loading motions from files that already have a status
-    public Motion(String title, String motionText, int motionID, String session, String status, int yesVotes, int noVotes, int presentVotes, int absentVotes) {
-        this.title = title;
-        this.motionText = motionText;
-        this.motionID = motionID;
-        this.session = session;
-        this.status = status;
-
-        this.yesVotes = yesVotes;
-        this.noVotes = noVotes;
-        this.presentVotes = presentVotes;
-        this.absentVotes = absentVotes;
-
+    public Motion() {
+        motionID = getNextID();
         setStaticValues();
+    }
+
+    // this is a dummy constructor to let us create temporary motions without trigger getNextID()
+    public Motion(int a) {}
+
+    /**
+     * Adds a motion to the list of motions in this session
+     * @param motion
+     */
+    public static void addMotionToList(Motion motion) {
+        motionList.add(motion);
+    }
+
+    /**
+     * Iteratively calls motions to be loaded from a file
+     */
+    public static void bufferAllMotions() {
+        while (true) {
+
+            // this produces a filepath that looks something like "./files/session/session-1.mtn"
+            File file = new File("./files/" + session + "/" + session + "-" + motionCount + ".mtn");
+
+            if (!file.isFile()) {break;}
+
+            try {
+                Scanner s = new Scanner(file);
+
+                // retrieve the motion's type
+                s.nextLine(); // we skip a line because the first one is the motion's title
+                String motionType = s.nextLine().split("TYPE OF MOTION: ")[1];
+
+                s.close();
+
+                // create a new instance of the appropriate motion type
+                @SuppressWarnings("rawtypes")
+                Class motionClass = Class.forName("motionLib." + motionType.replaceAll(" ", ""));
+
+                // we let the motion subclass handle the rest of the buffering (loading) because the details vary by motion type
+
+                @SuppressWarnings("unchecked")
+                Motion motion = (Motion) motionClass.getConstructor().newInstance();
+
+                motion.buffer(file);
+                motionList.add(motion);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    /**
+     * Decrements the motionCount in cases where we want to create dummy instance of
+     * motions but not actually increment the count, such as when we're searching for a motion
+     */
+    public static void decrementMotionCount() {
+        motionCount--;
     }
 
 
     /**
-     * Displays the motion in the terminal.
+     * Displays the motion instance in the terminal
      */
     public void display() {
-        ScreenWriter.clearScreen();
+        ReaderWriter.clearScreen();
 
         System.out.println("MOTION ID: " + session + "-" + motionID);
         System.out.println("TYPE OF MOTION: " + name);
@@ -92,7 +144,6 @@ public abstract class Motion {
     }
 
     /**
-     *
      * @return int motion's id
      */
     public int getMotionID() {
@@ -100,8 +151,23 @@ public abstract class Motion {
     }
 
     /**
+     * @return an ID for the next motion to be created
+     */
+    public static int getNextID() {
+        motionCount++;
+        return motionCount - 1;
+    }
+
+    /**
+     * @return the ArrayList of motions for the session
+     */
+    public static ArrayList<Motion> getMotionList() {
+        return motionList;
+    }
+
+    /**
      *
-     * @return String motion's title
+     * @return the motion's title
      */
     public String getTitle() {
         return title;
@@ -120,6 +186,20 @@ public abstract class Motion {
      */
     public String getStatus() {
         return status;
+    }
+
+    /**
+     * Lists all motions in the current session
+     */
+    public static void listMotions() {
+        System.out.println("\nMotions in this session:\n");
+
+        // we flip the stack so the most recent motions are first
+        Collections.reverse(motionList);
+        for (Motion motion : motionList) {
+            System.out.println("#" + motion.getMotionID() + " " + motion.getTitle() + " (" + motion.getStatus() + ")");
+        }
+        Collections.reverse(motionList);
     }
 
     /**
@@ -143,34 +223,18 @@ public abstract class Motion {
     }
 
     /**
-     * Saves the motion to a file in the session's directory.
+     * Saves the motion to a file in the session's directory. This method is
+     * abstract because the information saved varies by motion type.
      */
-    public void save() {
-        File file = new File("./files/" + session + "/" + session + "-" + motionID + ".mtn");
+    public abstract void save();
 
-        try {
-            FileWriter fw = new FileWriter(file);
-            fw.write(
-                "TITLE: " + title +
-                "\nTYPE OF MOTION: " + name +
-                "\nSTATUS: " + status +
-
-                "\n\nAFFIRMATIVE VOTES: " + yesVotes +
-                "\nNEGATIVE VOTES: " + noVotes +
-                "\nPRESENT VOTES: " + presentVotes +
-                "\nABSENT VOTES: " + absentVotes +
-
-                "\n\nTEXT: " + motionText
-            );
-
-            fw.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        MotionTracker.getInstance().addMotion(this);
+    /**
+     * Sets the session name for the Motion class to use in creating motions
+     * @param sessionName String
+     */
+    public static void setSession(String session) {
+        Motion.session = session;
     }
-
 
     /**
      * Sets the static values for specific types of motions
@@ -179,24 +243,18 @@ public abstract class Motion {
 
 
     /**
-     * Records the votes for a motion, determines pass/fail, and updates the status
-     * @param yesVotes
-     * @param noVotes
-     * @param presentVotes
-     * @param absentVotes
+     * Records the votes for a motion, determines pass/fail, and updates the status.
+     * Technically, present and absent votes don't matter, but they're recorded anyway.
+     * @param votes [0] yes, [1] no, [2] present, [3] absent
      */
-    public void vote(int yesVotes, int noVotes, int presentVotes, int absentVotes) {
-        this.yesVotes = yesVotes;
-        this.noVotes = noVotes;
-        this.presentVotes = presentVotes;
-        this.absentVotes = absentVotes;
+    public void vote(int ... votes) {
+        yesVotes = votes[0];
+        noVotes = votes[1];
+        presentVotes = votes[2];
+        absentVotes = votes[3];
 
-        // Check if the motion passed
-        if (majorityNeeded && yesVotes > noVotes) {
-            status = "passed";
-            System.out.println("The motion passes");
-            pass();
-        } else if (superMajorityNeeded && yesVotes >= (yesVotes + noVotes) * 2 / 3) {
+        // Check if the motion passed. It passes with either a majority or a supermajority, whichever necessary
+        if ((majorityNeeded && yesVotes > noVotes) || (superMajorityNeeded && yesVotes > (yesVotes + noVotes) * 2 / 3)) {
             status = "passed";
             System.out.println("The motion passes");
             pass();
@@ -205,6 +263,13 @@ public abstract class Motion {
             System.out.println("The motion fails");
         }
     }
+
+    //#region Abstract Methods
+
+    /**
+     * Called to load a motion from a file.
+     */
+    public abstract void buffer(File file);
 
     /**
      * Actions to take when a motion is first introduced. This is
@@ -217,4 +282,5 @@ public abstract class Motion {
      */
     public abstract void pass();
 
+    //#endregion
 }

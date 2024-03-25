@@ -1,9 +1,10 @@
 package utils;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class ScreenWriter {
+public class ReaderWriter {
 
     /**
      * Clears the terminal screen
@@ -11,6 +12,19 @@ public class ScreenWriter {
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
+    }
+
+    /**
+     * Creates a new directory
+     * @param name String the file's name
+     * @param path String the file's path
+     * @return boolean: true if the directory was created, false if it already exists
+     */
+    public static boolean createDir(String name, String path) {
+
+        File f = new File(path + name);
+
+        return f.mkdir();
     }
 
     /**

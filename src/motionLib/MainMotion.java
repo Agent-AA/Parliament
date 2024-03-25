@@ -1,21 +1,24 @@
 package motionLib;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.util.Scanner;
+
 public class MainMotion extends Motion {
 
-    public MainMotion(String title, String motionText, int motionID, String session) {
-        super(title, motionText, motionID, session);
+    public MainMotion(String title, String motionText) {
+        super(title, motionText);
     }
 
     // Overloaded constructor for loading motions from files that already have a status and votes
-    public MainMotion(String title, String motionText, int motionID, String session, String status, int yesVotes, int noVotes, int presentVotes, int absentVotes) {
-        super(title, motionText, motionID, session, status, yesVotes, noVotes, presentVotes, absentVotes);
+    public MainMotion() {
+        super();
     }
 
-    @Override
-    public void introduce() {}
-    
-    @Override
-    public void pass() {}
+    // Dummy constructor so we can make instances without triggering getNextID()
+    public MainMotion(int a) {
+        super(a);
+    }
 
     @Override
     public void setStaticValues() { // static values are set in this function rather than the constructor
@@ -38,5 +41,63 @@ public class MainMotion extends Motion {
         superMajorityNeeded = false;
         precedent = 0;
         citation = "RONR 10:8";
+    }
+
+    @Override
+    public void buffer(File file) {
+
+        try {
+            Scanner s = new Scanner(file);
+
+            title = s.nextLine().split("TITLE: ")[1];
+            s.nextLine(); // skip the motionType line; we already know it's a main motion
+            status = s.nextLine().split("STATUS: ")[1];
+            s.nextLine(); // skip empty line
+            yesVotes = Integer.parseInt(s.nextLine().split("AFFIRMATIVE VOTES: ")[1]);
+            noVotes = Integer.parseInt(s.nextLine().split("NEGATIVE VOTES: ")[1]);
+            presentVotes = Integer.parseInt(s.nextLine().split("PRESENT VOTES: ")[1]);
+            absentVotes = Integer.parseInt(s.nextLine().split("ABSENT VOTES: ")[1]);
+            s.nextLine(); // skip empty line
+            motionText = s.nextLine().split("TEXT: ")[1];
+
+            s.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void introduce() {}
+
+    @Override
+    public void pass() {}
+
+    @Override
+    public void save() {
+
+        File file = new File("./files/" + Motion.session + "/" + Motion.session + "-" + motionID + ".mtn");
+
+        try {
+            FileWriter fw = new FileWriter(file);
+            fw.write(
+                "TITLE: " + title +
+                "\nTYPE OF MOTION: " + name +
+                "\nSTATUS: " + status +
+
+                "\n\nAFFIRMATIVE VOTES: " + yesVotes +
+                "\nNEGATIVE VOTES: " + noVotes +
+                "\nPRESENT VOTES: " + presentVotes +
+                "\nABSENT VOTES: " + absentVotes +
+
+                "\n\nTEXT: " + motionText
+            );
+
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Motion.addMotionToList(this);
     }
 }

@@ -1,27 +1,25 @@
 import commands.CommandParser;
-import utils.MotionTracker;
-import utils.ScreenWriter;
+import motionLib.Motion;
+import utils.ReaderWriter;
 
 public class Main {
     public static void main(String[] args) {
 
-        ScreenWriter.introScreen();
+        ReaderWriter.introScreen();
 
-        String sessionName = ScreenWriter.readInput("\nEnter a session name: ");
+        String session = ReaderWriter.readInput("\nEnter a session name: ");
 
-        MotionTracker.getInstance().setSession(sessionName);
-        MotionTracker.getInstance().bufferMotions();
+        Motion.setSession(session);
+        Motion.bufferAllMotions();
 
-        CommandParser.setSession(sessionName);
-
-        if (MotionTracker.createDir(sessionName, "./files/")) {
-            System.out.println("\n" + sessionName + " session successfully created.");
+        if (ReaderWriter.createDir(session, "./files/")) {
+            System.out.println("\n" + session + " session successfully created.");
         } else {
-            System.out.println("\n" + sessionName + " session opened.");
+            System.out.println("\n" + session + " session opened.");
         }
 
         while (true) {
-            CommandParser.parseCommand(ScreenWriter.readInput("\n"+ sessionName + "> "));
+            CommandParser.parseCommand(ReaderWriter.readInput("\n"+ session + "> "));
         }
     }
 }

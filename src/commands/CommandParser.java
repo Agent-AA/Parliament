@@ -1,19 +1,12 @@
 package commands;
 
 import motionLib.*;
-import utils.MotionTracker;
-import utils.ScreenWriter;
+import utils.ReaderWriter;
 
 /**
  * Static utility class that interprets commands from the user.
  */
 public class CommandParser {
-
-    private static String session;
-
-    public static void setSession(String session) {
-        CommandParser.session = session;
-    }
 
     //#region help command
     private static Command help = new Command("help") {
@@ -59,13 +52,13 @@ public class CommandParser {
 
             // Get input
             String motionType = input.split(" ")[1];
-            String motionTitle = ScreenWriter.readInput("\nMotion title: ");
-            String motionText = ScreenWriter.readInput("\nMotion text:\n\n");
+            String motionTitle = ReaderWriter.readInput("\nMotion title: ");
+            String motionText = ReaderWriter.readInput("\nMotion text:\n\n");
 
             // Determine the motion type and save if there is one
             for (Class<Motion> motion : motionList) {
                 try {
-                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance(motionTitle,motionText,MotionTracker.getNextID(),session); // Create an instance of the Motion class
+                    Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class).newInstance(motionTitle,motionText); // Create an instance of the Motion class
                 if (motionType.equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
                     motionInstance.introduce(); // take any additional actions that the motion requires
                     motionInstance.save(); // there is unfortunately no way to call reference statically like this
@@ -87,7 +80,7 @@ public class CommandParser {
     //#region list command
     private static Command list = new Command("") {
         public void execute(String input) {
-            MotionTracker.listMotions();
+            Motion.listMotions();
         }
     };
     //#endregion
@@ -104,7 +97,7 @@ public class CommandParser {
             // We have to check because if it's not a number, Integer.parseInt will complain about it.
             if (motionIDOrName.matches("[0-9]+")) {
 
-                for (Motion motion : MotionTracker.getMotionStack()) {
+                for (Motion motion : Motion.getMotionList()) {
                     if (motion.getMotionID() == Integer.parseInt(motionIDOrName)) {
                         motion.display();
                         return;
@@ -112,7 +105,7 @@ public class CommandParser {
                 }
                 return;
             } else { // we presume that otherwise the user has entered a name
-                for (Motion motion : MotionTracker.getMotionStack()) {
+                for (Motion motion : Motion.getMotionList()) {
                     if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase())) {
                         motion.display();
                         return;
@@ -146,7 +139,8 @@ public class CommandParser {
                 System.out.println("\n\nAll motions: ");
                 for (Class<Motion> motion : motionList) {
                     try {
-                        Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,"");
+                        Motion motionInstance = motion.getDeclaredConstructor().newInstance();
+                        Motion.decrementMotionCount(); // creating the dummy instance above increments the motion count, but we don't want that, so we reverse it
                         System.out.println(motionInstance.getShortName());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -158,7 +152,8 @@ public class CommandParser {
             } else if (input.split(" ").length == 2) {
                 for (Class<Motion> motion : motionList) {
                     try {
-                        Motion motionInstance = motion.getDeclaredConstructor(String.class, String.class, int.class, String.class).newInstance("","",0,""); // Create an instance of the Motion class
+                        Motion motionInstance = motion.getDeclaredConstructor().newInstance(); // Create a dummy instance of the desired motion's class
+                        Motion.decrementMotionCount(); // creating the dummy instance above increments the motion count, but we don't want that, so we reverse it
                     if (input.split(" ")[1].equals(motionInstance.getShortName())) { // Call getMotionName() on the instance
                         motionInstance.reference(); // there is unfortunately no way to call reference statically like this
                         return;
@@ -193,7 +188,7 @@ public class CommandParser {
     // The quintessential method for receiving and interpreting commands. This should never be touched
     public static void parseCommand(String input) {
 
-        ScreenWriter.introScreen();
+        ReaderWriter.introScreen();
         for (Command cmd : commandList) {
             if (input.split(" ")[0].equals(cmd.getKeyword())) {
                 cmd.execute(input);
