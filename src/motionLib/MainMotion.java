@@ -58,6 +58,11 @@ public class MainMotion extends Motion {
     @Override
     public void introduce() {
         title = ReaderWriter.readInput("\nMotion Title: ");
+
+        if (title == null) {
+            title = "Unnamed";
+        }
+
         motionText = ReaderWriter.readInput("\nMotion Text:\n\n");
     }
 

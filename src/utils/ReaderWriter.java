@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import motionLib.Motion;
+
 public class ReaderWriter {
 
     /**
@@ -12,6 +14,15 @@ public class ReaderWriter {
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
+    }
+
+    /**
+     * Deletes a motions file
+     * @param motion the motion to delete
+     */
+    public static void deleteFile(Motion motion) {
+        File f = new File("./files/" + motion.getSession() + "/" + motion.getSession() + "-" + motion.getMotionID() + ".mtn");
+        f.delete();
     }
 
     /**

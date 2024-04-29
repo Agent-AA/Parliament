@@ -18,11 +18,13 @@ public class CommandParser {
                     Name     Description
                     ----     -----------
                     (enter)  List all motions for the session
-                    disp[]   Display a motion by entering its ID or name
+                    delete[] Delete a motion; enter its ID or name
+                    disp[]   Display a motion; enter its ID or name
                     exit     Exit the program
                     help     Display this message
                     intro[]  Introduce a new motion; enter its type
-                    ref[]    Reference a type of motion; enter its type""");
+                    ref[]    Reference a type of motion; enter its type
+                    vote[]   Vote on a motion; enter its ID or name""");
             }
         };
     //#endregion
@@ -31,6 +33,22 @@ public class CommandParser {
     private static Command exit = new Command("exit") {
         public void execute(String input) {
             System.exit(0);
+        }
+    };
+    //#endregion
+
+    //#region del command
+    private static Command delete = new Command("del") {
+
+        public void execute(String input) {
+
+            String motionIDOrName = input.split(" ")[1];
+
+            // Look up the motion
+            Motion motion = Motion.lookUpMotion(motionIDOrName);
+
+            // Delete the motion
+            motion.delete();
         }
     };
     //#endregion
@@ -112,12 +130,13 @@ public class CommandParser {
                 // Display the motion
                 motion.display();
 
-                String votes = ReaderWriter.readInput("\nEnter votes: ");
+                String votes = ReaderWriter.readInput("\nEnter votes (yes no present absent): ");
 
                 motion.vote(votes);
                 motion.save();
         }
     };
+    //#endregion
 
     /* MOTION REFERENCE LIST - this array is used by several functions to
        look up motions */
@@ -180,6 +199,7 @@ public class CommandParser {
     //#region commandParsing
     // This is the array of commands that the parseCommand method uses
     private static Command[] commandList = {
+        delete,
         disp,
         exit,
         help,

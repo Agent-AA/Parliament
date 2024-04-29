@@ -109,7 +109,22 @@ public abstract class Motion {
         motionCount--;
     }
 
-
+    /**
+     * Deletes a motion from the list of motions in this session. This
+     * function works differently depending on if the motion to delete is the most recent one made.
+     * If it is, the motion is entirely deleted. Otherwise, the motion is marked as deleted and ignored
+     * by the program but not actually deleted so as to preserve motion history.
+     */
+    public void delete() {
+        if (motionID + 1 == motionCount) {
+            motionList.remove(this);
+            ReaderWriter.deleteFile(this);
+            System.out.println("Motion deleted");
+        } else {
+            this.status = "deleted";
+            this.save();
+        }
+    }
     /**
      * Displays the motion instance in the terminal
      */
@@ -162,6 +177,13 @@ public abstract class Motion {
     }
 
     /**
+     * @return the current session name
+     */
+    public String getSession() {
+        return session;
+    }
+
+    /**
      * Returns the name of a motion class
      */
     public String getShortName() {
@@ -185,7 +207,9 @@ public abstract class Motion {
         // we flip the stack so the most recent motions are first
         Collections.reverse(motionList);
         for (Motion motion : motionList) {
-            System.out.println("#" + motion.getMotionID() + " " + motion.getTitle() + " (" + motion.getStatus() + ")");
+            if (motion.getStatus() != "deleted") {
+                System.out.println("#" + motion.getMotionID() + " " + motion.getTitle() + " (" + motion.getStatus() + ")");
+            }
         }
         Collections.reverse(motionList);
     }
@@ -197,13 +221,13 @@ public abstract class Motion {
         if (motionIDOrName.matches("[0-9]+")) {
 
             for (Motion motion : Motion.getMotionList()) {
-                if (motion.getMotionID() == Integer.parseInt(motionIDOrName)) {
+                if (motion.getMotionID() == Integer.parseInt(motionIDOrName) && motion.getStatus() != "deleted") {
                     return motion;
                 }
             }
         } else { // we presume that otherwise the user has entered a name
             for (Motion motion : Motion.getMotionList()) {
-                if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase())) {
+                if (motion.getTitle().toLowerCase().equals(motionIDOrName.toLowerCase()) && motion.getStatus() != "deleted") {
                     return motion;
                 }
             }
@@ -254,7 +278,6 @@ public abstract class Motion {
      * Sets the static values for specific types of motions
      */
     public abstract void setStaticValues();
-
 
     /**
      * Records the votes for a motion, determines pass/fail, and updates the status.
