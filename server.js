@@ -17,6 +17,8 @@ app.get('/admin', (req, res) => {
 //#endregion
 
 //#region ----- SESSION VARIABLES AND FUNCTIONS -----
+let initialized = false;
+
 let currentMotion = "None";
 
 let currentSpeaker = "None";
@@ -49,6 +51,7 @@ let questionRecency = [];
 // This is the primary update function for representatives' browsers that will be used for live polling
 app.get('/data', (req, res) => {
   let data = {
+    "initialized" : initialized,
     "currentMotion" : currentMotion,
     "speaker" : {
       "name" : currentSpeaker,
@@ -112,6 +115,7 @@ app.post('/update', (req, res) => {
   questionRecency = req.body.questionOrder.recency;
   questionQueue = req.body.questionOrder.queue;
   
+  initialized = true;
 });
 
 app.listen(port, () => {
