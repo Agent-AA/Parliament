@@ -94,7 +94,7 @@
                 </div>
             </div>
             <div class="row" style="margin: 24px 0px 0px 0px;">
-                <div class="col" style="text-align: center;"><button class="btn btn-primary" type="button" style="margin: 6px 0px;">Pause Time</button></div>
+                <div id="pause-button" class="col" style="text-align: center;"><button class="btn btn-primary" type="button" style="margin: 6px 0px;">Start Time</button></div>
                 <div class="col" style="text-align: center;"><button class="btn btn-primary" type="button" style="margin: 6px 0px;">Reset Time</button></div>
                 <div class="col" style="text-align: center;"><button class="btn btn-primary" type="button" style="margin: 6px 0px;">Update</button></div>
             </div>
@@ -107,11 +107,11 @@
                     <div class="col mb-4">
                         <div class="card bg-primary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
-                                <p class="fw-bold text-primary card-text mb-2">Affirmatives Speeches</p>
+                                <p class="fw-bold text-primary card-text mb-2">Affirmative Speeches</p>
                                 <h5 id="aff-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="last-aff" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
+                                <h5 id="aff-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
                                 <p class="fw-bold text-primary card-text mb-2">Queued Speakers</p>
-                                <ul class="list-unstyled" contenteditable="true">
+                                <ul id="aff-queue" class="list-unstyled" contenteditable="true">
                                     <li>None</li>
                                     <li>None</li>
                                     <li>None</li>
@@ -125,9 +125,9 @@
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-secondary card-text mb-2">Negative Speeches</p>
                                 <h5 id="neg-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="last-neg" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
+                                <h5 id="neg-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
                                 <p class="fw-bold text-secondary card-text mb-2">Queued Speakers</p>
-                                <ul class="list-unstyled" contenteditable="true">
+                                <ul id="neg-queue" class="list-unstyled" contenteditable="true">
                                     <li>None</li>
                                     <li>None</li>
                                     <li>None</li>
@@ -141,9 +141,9 @@
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-info card-text mb-2">Questioning</p>
                                 <h5 id="question-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="last-question" class="fw-bold card-title mb-3" contenteditable="true">None</h5>
+                                <h5 id="question-last" class="fw-bold card-title mb-3" contenteditable="true">None</h5>
                                 <p class="fw-bold text-info card-text mb-2">Questioning</p>
-                                <ul class="list-unstyled">
+                                <ul id="question-queue" class="list-unstyled">
                                     <li>None</li>
                                     <li>None</li>
                                     <li>None</li>
@@ -172,13 +172,13 @@
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
+                    <ul id="speaker-precedence" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
                         <li>None 0</li>
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
+                    <ul id="speaker-recency" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
                         <li>None</li>
                     </ul>
                 </div>
@@ -204,13 +204,13 @@
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
+                    <ul id="question-precedence" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
                         <li>None 0</li>
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
+                    <ul id="question-recency" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;" contenteditable="true">
                         <li>None</li>
                     </ul>
                 </div>

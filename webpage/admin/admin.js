@@ -1,4 +1,4 @@
-let timePaused = false;
+let timePaused = true;
 let affTotalSpeeches = 0;
 let affLastSpeaker = "None";
 let affSpeechTime = "0:00";
@@ -15,7 +15,112 @@ let affQueue = [];
 let negQueue = [];
 let questionQueue = [];
 
-// The quintessential update function that the admin page uses to control the server
+// If we accidentally close our browser and need to retrieve our data, we can do so here.
+$(document).ready(() => {
+    $.get("/data", (data) => {
+        if (data.initialized) {
+            $("#motion-title").text(data.motion);
+            $("#speaker-name").text(data.speaker.name);
+            $("#speaker-disposition").text(data.speaker.disposition);
+            $("#speaker-time").text(data.speaker.timeRemaining);
+            timePaused = data.speaker.timePaused;
+
+            $("#speaker-number").text("<strong>Speaker " + data.speaker.number + "</strong>");
+            
+            $("#aff-count").text(data.speaker.aff.totalSpeeches);
+            $("#aff-last").text(data.speaker.aff.lastSpeaker + " (" + data.speaker.aff.speechTime + ")");
+            $("aff-queue").empty();
+            for (let i = 0; i < data.speaker.speakingOrder.queue.aff.length; i++) {
+                $("#aff-queue").append("<li>" + data.speaker.speakingOrder.queue.aff[i] + "</li>");
+            }
+
+            $("#neg-count").text(data.speaker.neg.totalSpeeches);
+            $("#neg-last").text(data.speaker.neg.lastSpeaker + " (" + data.speaker.neg.speechTime + ")");
+            $("neg-queue").empty();
+            for (let i = 0; i < data.speaker.speakingOrder.queue.neg.length; i++) {
+                $("#neg-queue").append("<li>" + data.speaker.speakingOrder.queue.neg[i] + "</li>");
+            }
+
+            $("#question-count").text(data.speaker.question.totalQuestions);
+            $("#question-last").text(data.speaker.question.lastQuestioner);
+            $("question-queue").empty();
+            for (let i = 0; i < data.speaker.questionOrder.queue.length; i++) {
+                $("#question-queue").append("<li>" + data.speaker.questionOrder.queue[i] + "</li>");
+            }
+
+            $("#speaker-precedence").empty();
+            for (let i = 0; i < data.speaker.speakingOrder.precedence.length; i++) {
+                $("#speaker-precedence").append("<li>" + data.speaker.speakingOrder.precedence[i][0] + " " + data.speaker.speakingOrder.precedence[i][1] + "</li>");
+            }
+
+            $("#speaker-recency").empty();
+            for (let i = 0; i < data.speaker.speakingOrder.recency.length; i++) {
+                $("#speaker-recency").append("<li>" + data.speaker.speakingOrder.recency[i][0] + "</li>");
+            }
+
+            $("#question-precedence").empty();
+            for (let i = 0; i < data.speaker.questionOrder.precedence.length; i++) {
+                $("#question-precedence").append("<li>" + data.speaker.questionOrder.precedence[i][0] + " " + data.speaker.questionOrder.precedence[i][1] + "</li>");
+            }
+
+            $("#question-recency").empty();
+            for (let i = 0; i < data.speaker.questionOrder.recency.length; i++) {
+                $("#question-recency").append("<li>" + data.speaker.questionOrder.recency[i][0] + "</li>");
+            }
+        }
+    });
+})
+
+// The calibrate function takes the text on the dashboard, parses it, and stores it locally so it can be
+// send to the server.
+function calibrate() {
+    timePaused = $("#pause-button").hasClass("selected");
+    affTotalSpeeches = $("#aff-count").text();
+    affLastSpeaker = $("#aff-last").text().split(" ")[0];
+    affSpeechTime = $("#aff-last").text().split(" ")[1].slice(1, -1);
+    negTotalSpeeches = $("#neg-count").text();
+    negLastSpeaker = $("#neg-last").text().split(" ")[0];
+    negSpeechTime = $("#neg-last").text().split(" ")[1].slice(1, -1);
+    questionCount = $("#question-count").text();
+    lastQuestioner = $("#question-last").text();
+
+    affQueue = [];
+    $("#aff-queue li").each((index, element) => {
+        affQueue.push(element.text());
+    });
+
+    negQueue = [];
+    $("#neg-queue li").each((index, element) => {
+        negQueue.push(element.text());
+    });
+
+    questionQueue = [];
+    $("#question-queue li").each((index, element) => {
+        questionQueue.push(element.text());
+    });
+    
+    speakerPrecedence = [];
+    $("#speaker-precedence li").each((index, element) => {
+        speakerPrecedence.push(element.text().split(" "));
+    });
+
+    speakerRecency = [];
+    $("#speaker-recency li").each((index, element) => {
+        speakerRecency.push(element.text());
+    });
+
+    questionPrecedence = [];
+    $("#question-precedence li").each((index, element) => {
+        questionPrecedence.push(element.text().split(" "));
+    });
+
+    questionRecency = [];
+    $("#question-recency li").each((index, element) => {
+        questionRecency.push(element.text());
+    });
+}
+
+// The quintessential update function sends all of our data to the server.
 function sendUpdate() {
     const data = {
         "motion" : $("#motion-title").val(),
@@ -55,3 +160,11 @@ function sendUpdate() {
         }
     }
 }
+
+// When I press ctrl + u, I want to call the calibrate() and then sendUpdate() functions.
+$(document).keydown((event) => {
+    if (event.ctrlKey && event.key === "u") {
+        calibrate();
+        sendUpdate();
+    }
+});
