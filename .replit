@@ -1,0 +1,20 @@
+modules = ["web", "nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Start Node Server"
+
+[[workflows.workflow]]
+name = "Start Node Server"
+mode = "sequential"
+author = 21907334
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node server"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
