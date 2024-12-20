@@ -1,0 +1,3 @@
+This is the design document for parliament.
+
+(1) Parliament is an online website tool for presiding officers of Congressional debate. It gives presiding officers and representatives the ability to automate and facilitate proceedings as much as possible through computer interactions. However, POs should also be able to override and conduct affairs manually if representatives cannot access a computer.
