@@ -15,6 +15,8 @@ let affQueue = [];
 let negQueue = [];
 let questionQueue = [];
 
+// TODO queues and ordering don't load properly when the admin page is reloaded.
+
 // If we accidentally close our browser and need to retrieve our data, we can do so here.
 $(document).ready(() => {
     $.get("/data", (data) => {
@@ -25,66 +27,64 @@ $(document).ready(() => {
             $("#speaker-time").text(data.speaker.timeRemaining);
             timePaused = data.speaker.timePaused;
 
-            $("#speaker-number").text(
-                "<strong>Speaker " + data.speaker.number + "</strong>",
-            );
+            $("#speaker-number").text(data.speaker.number,);
 
-            $("#aff-count").text(data.speaker.aff.totalSpeeches);
+            $("#aff-count").text(data.aff.totalSpeeches);
             $("#aff-last").text(
-                data.speaker.aff.lastSpeaker +
+                data.aff.lastSpeaker +
                     " (" +
-                    data.speaker.aff.speechTime +
+                    data.aff.speechTime +
                     ")",
             );
             $("aff-queue").empty();
             for (
                 let i = 0;
-                i < data.speaker.speakingOrder.queue.aff.length;
+                i < data.speakingOrder.queue.aff.length;
                 i++
             ) {
                 $("#aff-queue").append(
-                    "<li>" + data.speaker.speakingOrder.queue.aff[i] + "</li>",
+                    "<li>" + data.speakingOrder.queue.aff[i] + "</li>",
                 );
             }
 
-            $("#neg-count").text(data.speaker.neg.totalSpeeches);
+            $("#neg-count").text(data.neg.totalSpeeches);
             $("#neg-last").text(
-                data.speaker.neg.lastSpeaker +
+                data.neg.lastSpeaker +
                     " (" +
-                    data.speaker.neg.speechTime +
+                    data.neg.speechTime +
                     ")",
             );
             $("neg-queue").empty();
             for (
                 let i = 0;
-                i < data.speaker.speakingOrder.queue.neg.length;
+                i < data.speakingOrder.queue.neg.length;
                 i++
             ) {
                 $("#neg-queue").append(
-                    "<li>" + data.speaker.speakingOrder.queue.neg[i] + "</li>",
+                    "<li>" + data.speakingOrder.queue.neg[i] + "</li>",
                 );
             }
 
-            $("#question-count").text(data.speaker.question.totalQuestions);
-            $("#question-last").text(data.speaker.question.lastQuestioner);
+            $("#question-count").text(data.question.totalQuestions);
+            $("#question-last").text(data.question.lastQuestioner);
             $("question-queue").empty();
-            for (let i = 0; i < data.speaker.questionOrder.queue.length; i++) {
+            for (let i = 0; i < data.questionOrder.queue.length; i++) {
                 $("#question-queue").append(
-                    "<li>" + data.speaker.questionOrder.queue[i] + "</li>",
+                    "<li>" + data.questionOrder.queue[i] + "</li>",
                 );
             }
 
             $("#speaker-precedence").empty();
             for (
                 let i = 0;
-                i < data.speaker.speakingOrder.precedence.length;
+                i < data.speakingOrder.precedence.length;
                 i++
             ) {
                 $("#speaker-precedence").append(
                     "<li>" +
-                        data.speaker.speakingOrder.precedence[i][0] +
+                        data.speakingOrder.precedence[i][0] +
                         " " +
-                        data.speaker.speakingOrder.precedence[i][1] +
+                        data.speakingOrder.precedence[i][1] +
                         "</li>",
                 );
             }
@@ -92,25 +92,25 @@ $(document).ready(() => {
             $("#speaker-recency").empty();
             for (
                 let i = 0;
-                i < data.speaker.speakingOrder.recency.length;
+                i < data.speakingOrder.recency.length;
                 i++
             ) {
                 $("#speaker-recency").append(
-                    "<li>" + data.speaker.speakingOrder.recency[i][0] + "</li>",
+                    "<li>" + data.speakingOrder.recency[i][0] + "</li>",
                 );
             }
 
             $("#question-precedence").empty();
             for (
                 let i = 0;
-                i < data.speaker.questionOrder.precedence.length;
+                i < data.questionOrder.precedence.length;
                 i++
             ) {
                 $("#question-precedence").append(
                     "<li>" +
-                        data.speaker.questionOrder.precedence[i][0] +
+                        data.questionOrder.precedence[i][0] +
                         " " +
-                        data.speaker.questionOrder.precedence[i][1] +
+                        data.questionOrder.precedence[i][1] +
                         "</li>",
                 );
             }
@@ -118,11 +118,11 @@ $(document).ready(() => {
             $("#question-recency").empty();
             for (
                 let i = 0;
-                i < data.speaker.questionOrder.recency.length;
+                i < data.questionOrder.recency.length;
                 i++
             ) {
                 $("#question-recency").append(
-                    "<li>" + data.speaker.questionOrder.recency[i][0] + "</li>",
+                    "<li>" + data.questionOrder.recency[i][0] + "</li>",
                 );
             }
         }
@@ -183,38 +183,38 @@ function sendUpdate() {
     const data = {
         "motion" : $("#motion-title").text(),
         "speaker" : {
-            "name" : $("#speaker-name").text(),
+            "name" : $("#speaker-name strong").text(),
             "disposition": $("#speaker-disposition").text(),
             "timeRemaining": $("#speaker-time").text(),
             "number": $("#speaker-number").text(),
-            "timePaused": timePaused,
-            "aff": {
-                "totalSpeeches": affTotalSpeeches,
-                "lastSpeaker": affLastSpeaker,
-                "speechTime": affSpeechTime,
-            },
-            "neg": {
-                "totalSpeeches": negTotalSpeeches,
-                "lastSpeaker": negLastSpeaker,
+            "timePaused": timePaused 
+        },
+        "aff": {
+            "totalSpeeches": affTotalSpeeches,
+            "lastSpeaker": affLastSpeaker,
+            "speechTime": affSpeechTime,
+        },
+        "neg": {
+            "totalSpeeches": negTotalSpeeches,
+            "lastSpeaker": negLastSpeaker,
                 "speechTime": negSpeechTime,
+        },
+        "question": {
+            "totalQuestions": questionCount,
+            "lastQuestioner": lastQuestioner,
+        },
+        "speakingOrder": {
+            "precedence": speakerPrecedence,
+            "recency": speakerRecency,
+            "queue": {
+                "aff": affQueue,
+                "neg": negQueue,
             },
-            "question": {
-                "totalQuestions": questionCount,
-                "lastQuestioner": lastQuestioner,
-            },
-            "speakingOrder": {
-                "precedence": speakerPrecedence,
-                "recency": speakerRecency,
-                "queue": {
-                    "aff": affQueue,
-                    "neg": negQueue,
-                },
-            },
-            "questionOrder": {
-                "precedence": questionPrecedence,
-                "recency": questionRecency,
-                "queue": questionQueue,
-            },
+        },
+        "questionOrder": {
+            "precedence": questionPrecedence,
+            "recency": questionRecency,
+            "queue": questionQueue,
         },
     };
     console.log(data);

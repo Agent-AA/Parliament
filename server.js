@@ -4,8 +4,11 @@ const path = require('path')
 const app = express();
 const port = 8000;
 
+app.use(express.urlencoded({ extended: true })); 
+
 //#region ----- Webpage and static file requests -----
 app.use(express.static(path.join(__dirname, '/webpage/player')));
+app.use(express.static(path.join(__dirname, '/webpage/admin')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/webpage/player/index.html'));
@@ -52,7 +55,7 @@ let questionRecency = [];
 app.get('/data', (req, res) => {
   let data = {
     "initialized" : initialized,
-    "currentMotion" : currentMotion,
+    "motion" : currentMotion,
     "speaker" : {
       "name" : currentSpeaker,
       "disposition" : disposition,
@@ -87,12 +90,13 @@ app.get('/data', (req, res) => {
       "queue" : questionQueue
     }
   }
-
+  console.log(data);
   res.send(data);
 });
 
 // The admin page posts updates here
 app.post('/update', (req, res) => {
+  console.log(req.body);
   currentMotion = req.body.motion;
   currentSpeaker = req.body.speaker.name;
   disposition = req.body.speaker.disposition;
