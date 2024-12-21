@@ -54,7 +54,7 @@ $(document).ready(() => {
             );
 
             affQueue = data.speakingOrder.queue.aff;
-            $("aff-queue").empty();
+            $("#aff-queue").empty();
             for (
                 let i = 0;
                 i < data.speakingOrder.queue.aff.length;
@@ -75,7 +75,7 @@ $(document).ready(() => {
                     ")",
             );
             negQueue = data.speakingOrder.queue.neg;
-            $("neg-queue").empty();
+            $("#neg-queue").empty();
             for (
                 let i = 0;
                 i < data.speakingOrder.queue.neg.length;
@@ -91,7 +91,7 @@ $(document).ready(() => {
             lastQuestioner = data.question.lastQuestioner;
             $("#question-last").text(data.question.lastQuestioner);
             questionQueue = data.questionOrder.queue;
-            $("question-queue").empty();
+            $("#question-queue").empty();
             for (let i = 0; i < data.questionOrder.queue.length; i++) {
                 $("#question-queue").append(
                     "<li>" + data.questionOrder.queue[i] + "</li>",
@@ -122,7 +122,7 @@ $(document).ready(() => {
                 i++
             ) {
                 $("#speaker-recency").append(
-                    "<li>" + data.speakingOrder.recency[i][0] + "</li>",
+                    "<li>" + data.speakingOrder.recency[i] + "</li>",
                 );
             }
 
@@ -150,7 +150,7 @@ $(document).ready(() => {
                 i++
             ) {
                 $("#question-recency").append(
-                    "<li>" + data.questionOrder.recency[i][0] + "</li>",
+                    "<li>" + data.questionOrder.recency[i] + "</li>",
                 );
             }
         }
