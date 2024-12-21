@@ -1,3 +1,4 @@
+//#region ----- Global Variables -----
 let timePaused = true;
 let affTotalSpeeches = 0;
 let affLastSpeaker = "None";
@@ -8,16 +9,29 @@ let negSpeechTime = "0:00";
 let questionCount = 0;
 let lastQuestioner = "None";
 let speakerPrecedence = [];
+/**
+ * @type {Array<string>}
+ * Items with an earlier index have the higher priority; i.e., they are the least recent.
+ */
 let speakerRecency = [];
 let questionPrecedence = [];
+/**
+ * @type {Array<string>}
+ * Items with an earlier index have the higher priority; i.e., they are the least recent.
+ */
 let questionRecency = [];
 let affQueue = [];
 let negQueue = [];
 let questionQueue = [];
+//#endregion
 
-// TODO queues and ordering don't load properly when the admin page is reloaded.
 
-// If we accidentally close our browser and need to retrieve our data, we can do so here.
+
+
+
+
+//#region ----- Events -----
+// On document load, downloads data to t
 $(document).ready(() => {
     $.get("/data", (data) => {
         if (data.initialized) {
@@ -29,13 +43,17 @@ $(document).ready(() => {
 
             $("#speaker-number").text(data.speaker.number,);
 
+            affTotalSpeeches = data.aff.totalSpeeches;
             $("#aff-count").text(data.aff.totalSpeeches);
+            affLastSpeaker = data.aff.lastSpeaker;
             $("#aff-last").text(
                 data.aff.lastSpeaker +
                     " (" +
                     data.aff.speechTime +
                     ")",
             );
+
+            affQueue = data.speakingOrder.queue.aff;
             $("aff-queue").empty();
             for (
                 let i = 0;
@@ -47,13 +65,16 @@ $(document).ready(() => {
                 );
             }
 
+            negTotalSpeeches = data.neg.totalSpeeches;
             $("#neg-count").text(data.neg.totalSpeeches);
+            negLastSpeaker = data.neg.lastSpeaker;
             $("#neg-last").text(
                 data.neg.lastSpeaker +
                     " (" +
                     data.neg.speechTime +
                     ")",
             );
+            negQueue = data.speakingOrder.queue.neg;
             $("neg-queue").empty();
             for (
                 let i = 0;
@@ -65,8 +86,11 @@ $(document).ready(() => {
                 );
             }
 
+            questionCount = data.question.totalQuestions;
             $("#question-count").text(data.question.totalQuestions);
+            lastQuestioner = data.question.lastQuestioner;
             $("#question-last").text(data.question.lastQuestioner);
+            questionQueue = data.questionOrder.queue;
             $("question-queue").empty();
             for (let i = 0; i < data.questionOrder.queue.length; i++) {
                 $("#question-queue").append(
@@ -74,6 +98,7 @@ $(document).ready(() => {
                 );
             }
 
+            speakerPrecedence = data.speakingOrder.precedence;
             $("#speaker-precedence").empty();
             for (
                 let i = 0;
@@ -89,6 +114,7 @@ $(document).ready(() => {
                 );
             }
 
+            speakerRecency = data.speakingOrder.recency;
             $("#speaker-recency").empty();
             for (
                 let i = 0;
@@ -100,6 +126,7 @@ $(document).ready(() => {
                 );
             }
 
+            questionPrecedence = data.questionOrder.precedence;
             $("#question-precedence").empty();
             for (
                 let i = 0;
@@ -115,6 +142,7 @@ $(document).ready(() => {
                 );
             }
 
+            questionRecency = data.questionOrder.recency;
             $("#question-recency").empty();
             for (
                 let i = 0;
@@ -129,8 +157,19 @@ $(document).ready(() => {
     });
 });
 
-// The calibrate function takes the text on the dashboard, parses it, and stores it locally so it can be
-// send to the server.
+// when the "update" button at the top of the page is clicked, update the server
+$("#update-motion-button").click(() => {
+    calibrate();
+    postUpdate();
+});
+//#endregion
+
+
+
+
+/**
+ * Parses all data from the html file and stores them in this file's global variables.
+ */
 function calibrate() {
     timePaused = $("#pause-button").hasClass("selected");
     affTotalSpeeches = $("#aff-count").text();
@@ -142,44 +181,21 @@ function calibrate() {
     questionCount = $("#question-count").text();
     lastQuestioner = $("#question-last").text();
 
-    affQueue = [];
-    $("#aff-queue li").each((index, element) => {
-        affQueue.push(element.innerText);
-    });
+    affQueue = parseList("#aff-queue", "", "None");
+    neqQueue = parseList("#neg-queue", "", "None");
+    questionQueue = parseList("#question-queue", "", "None");
 
-    negQueue = [];
-    $("#neg-queue li").each((index, element) => {
-        negQueue.push(element.innerText);
-    });
+    speakerPrecedence = parseList("#speaker-precedence", " ", "None 0");
+    speakerRecency = parseList("#speaker-recency", "", "None");
 
-    questionQueue = [];
-    $("#question-queue li").each((index, element) => {
-        questionQueue.push(element.innerText);
-    });
-
-    speakerPrecedence = [];
-    $("#speaker-precedence li").each((index, element) => {
-        speakerPrecedence.push(element.innerText.split(" "));
-    });
-
-    speakerRecency = [];
-    $("#speaker-recency li").each((index, element) => {
-        speakerRecency.push(element.innerText);
-    });
-
-    questionPrecedence = [];
-    $("#question-precedence li").each((index, element) => {
-        questionPrecedence.push(element.innerText.split(" "));
-    });
-
-    questionRecency = [];
-    $("#question-recency li").each((index, element) => {
-        questionRecency.push(element.innerText);
-    });
+    questionPrecedence = parseList("#question-precedence", " ", "None 0");
+    questionRecency = parseList("#question-recency", "", "None");
 }
 
-// The quintessential update function sends all of our data to the server.
-function sendUpdate() {
+/**
+ * Posts all data to the server.
+ */
+function postUpdate() {
     const data = {
         "motion" : $("#motion-title").text(),
         "speaker" : {
@@ -221,8 +237,31 @@ function sendUpdate() {
     $.post("/update", data);
 }
 
-// When I press ctrl + u, I want to call the calibrate() and then sendUpdate() functions.
-$("#update-motion-button").click(() => {
-    calibrate();
-    sendUpdate();
-});
+
+
+
+
+//#region ----- Helper Functions
+/**
+ * Parses an unordered list element and returns an array of the listed items.
+ * 
+ * @param {string} elementID the id attribute of the list element
+ * @param {string} delimiter a delimiter to split the text of a list item, if necessary.
+ * @param {string} placeholder a placeholder text list item to ignore. If no filler, pass "".
+ * 
+ * @returns {Array<string>} the list of items in the list element
+ */
+function parseList(elementID, delimiter, placeholder) {
+    let list = [];
+    $(elementID + " li").each((index, element) => {
+        if (element.innerText != placeholder) {
+            if (delimiter != "") {
+                list.push(element.innerText.split(delimiter));
+            } else {
+                list.push(element.innerText);
+            }
+        }
+    })
+
+    return list;
+}
