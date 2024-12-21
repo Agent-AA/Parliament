@@ -36,7 +36,7 @@ $(document).ready(() => {
                     data.aff.speechTime +
                     ")",
             );
-            $("aff-queue").empty();
+            $("#aff-queue").empty();
             for (
                 let i = 0;
                 i < data.speakingOrder.queue.aff.length;
@@ -54,7 +54,7 @@ $(document).ready(() => {
                     data.neg.speechTime +
                     ")",
             );
-            $("neg-queue").empty();
+            $("#neg-queue").empty();
             for (
                 let i = 0;
                 i < data.speakingOrder.queue.neg.length;
@@ -67,7 +67,7 @@ $(document).ready(() => {
 
             $("#question-count").text(data.question.totalQuestions);
             $("#question-last").text(data.question.lastQuestioner);
-            $("question-queue").empty();
+            $("#question-queue").empty();
             for (let i = 0; i < data.questionOrder.queue.length; i++) {
                 $("#question-queue").append(
                     "<li>" + data.questionOrder.queue[i] + "</li>",
@@ -96,7 +96,7 @@ $(document).ready(() => {
                 i++
             ) {
                 $("#speaker-recency").append(
-                    "<li>" + data.speakingOrder.recency[i][0] + "</li>",
+                    "<li>" + data.speakingOrder.recency[i] + "</li>",
                 );
             }
 
@@ -122,7 +122,7 @@ $(document).ready(() => {
                 i++
             ) {
                 $("#question-recency").append(
-                    "<li>" + data.questionOrder.recency[i][0] + "</li>",
+                    "<li>" + data.questionOrder.recency[i] + "</li>",
                 );
             }
         }
