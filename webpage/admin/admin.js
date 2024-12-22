@@ -151,7 +151,7 @@ $("#speaker-precedence").focusout(() => {
 
 // Speaking recency
 $("#speaker-recency").focusout(() => {
-    speakerRecency = ParseRecency("#speaker-recency");
+    speakerRecency = parseRecency("#speaker-recency");
     update();
 });
 
@@ -163,7 +163,7 @@ $("#question-precedence").focusout(() => {
 
 // Question recency
 $("#question-recency").focusout(() => {
-    questionRecency = ParseRecency("#question-recency");
+    questionRecency = parseRecency("#question-recency");
     update();
 });
 //#endregion
@@ -173,8 +173,88 @@ $("#question-recency").focusout(() => {
 // when the "start / stop time button" is clicked, pause or unpause the timer and update server
 $("#pause-button").click(() => {
     timePaused = !timePaused;
-    postUpdate();
+    update();
 });
+
+$("#end-button").click(() => {
+    concludeSpeaker();
+    update();
+});
+
+$("#aff-button").click(() => {
+    speaker = affQueue.shift();
+    disposition = "Affirmative";
+    time = 0;
+    timePaused = true;
+    update();
+});
+
+$("#neg-button").click(() => {
+    speaker = negQueue.shift();
+    disposition = "Negative";
+    time = 0;
+    timePaused = true;
+    update();
+});
+
+$("#question-button").click(() => {
+    speaker = questionQueue.shift();
+    disposition = "Question";
+    time = 0;
+    timePaused = false;
+    update();
+});
+
+// Shortcuts
+// ctrl + space to pause / unpause
+$(document).keydown((e) => {
+    if (e.ctrlKey && e.key == " ") {
+        timePaused = !timePaused;
+        update();
+    }
+});
+
+// ctrl + enter to end speaker
+$(document).keydown((e) => {
+    if (e.ctrlKey && e.key == "Enter") {
+        concludeSpeaker();
+        update();
+    }
+});
+
+// ctrl + q to start question
+$(document).keydown((e) => {
+    if (e.ctrlKey && e.key == "q") {
+        speaker = questionQueue.shift();
+        disposition = "Question";
+        time = 0;
+        timePaused = false;
+        update();
+    }
+});
+
+// ctrl + a to start affirmative
+$(document).keydown((e) => {
+    if (e.ctrlKey && e.key == "a") {
+        speaker = affQueue.shift();
+        disposition = "Affirmative";
+        time = 0;
+        timePaused = true;
+        update();
+    }
+});
+
+// ctrl + n to start negative
+$(document).keydown((e) => {
+    if (e.ctrlKey && e.key == "n") {
+        speaker = negQueue.shift();
+        disposition = "Negative";
+        time = 0;
+        timePaused = true;
+        update();
+    }
+});
+
 //#endregion
 
 
@@ -188,6 +268,8 @@ $("#pause-button").click(() => {
 * sorts the queues and orders.
 */
 function update() {
+
+    number = affTotalSpeeches + negTotalSpeeches + 1;
 
     // If any of the ordering lists are blank, autofill them based off of speaker recency.
     if (speakerPrecedence.length == 0) {
@@ -264,6 +346,12 @@ function updateHTML() {
     $("#speaker-name").text(speaker);
     $("#speaker-time").text(timeToString(time));
     $("#speaker-number").text(number);
+    $("#speaker-disposition").text(disposition);
+    if (disposition == "Question") {
+        $("#speaker-number").text("");
+    } else {
+        $("#speaker-number").text("Speaker " + number);
+    }
 
     $("#header-name").text(speaker);
     $("#header-time").text(timeToString(time));
@@ -325,7 +413,7 @@ function updateHTML() {
 }
 
 /**
- * Calibrates and then posts all data to the server.
+ * Posts data to server
  */
 function postUpdate() {
     const data = {
@@ -368,6 +456,40 @@ function postUpdate() {
     console.log(data);
     $.post("/update", data);
 }
+
+/**
+ * Concludes the current speaker listed on the speaker card and updates the other cards accordingly.
+ */
+function concludeSpeaker() {
+    timePaused = true;
+    // Update the appropriate action card.
+    switch (disposition) {
+        case "Affirmative":
+            affTotalSpeeches++;
+            affLastSpeaker = speaker;
+            affSpeechTime = time;
+            updateSpeakingOrder(speaker);
+            break;
+        case "Negative":
+            negTotalSpeeches++;
+            negLastSpeaker = speaker;
+            negSpeechTime = time;
+            updateSpeakingOrder(speaker);
+            break;
+        case "Question":
+            questionCount++;
+            lastQuestioner = speaker;
+            updateQuestionOrder(speaker);
+            break;
+    }
+
+    // Clear the speaker card
+    speaker = "None";
+    disposition = "None";
+    time = 0;
+
+    update();
+}
 //#endregion
 
 
@@ -382,7 +504,7 @@ function postUpdate() {
  * 
  * @returns {Array<string>} the list of items in the list element
  */
-function ParseRecency(elementID) {
+function parseRecency(elementID) {
     let list = [];
     $(elementID + " li").each((index, element) => {
         if (element.innerText != "None") {
@@ -411,6 +533,32 @@ function parsePrecedence(elementID) {
 }
 
 /**
+ * Updates the speaking order by incrementing the speaker's precedence and putting them at the
+ * end of the recency list.
+ * 
+ * @param {*string} speaker the name of the speaker
+ */
+function updateSpeakingOrder(speaker) {
+    let precedenceIndex = speakerPrecedence.findIndex((a) => a[0] == speaker);
+    speakerPrecedence[precedenceIndex][1]++;
+    speakerRecency.splice(speakerRecency.indexOf(speaker), 1);
+    speakerRecency.push(speaker);
+}
+
+/**
+ * Updates the question order by incrementing the questioner's precedence and putting them at the
+ * end of the recency list.
+ * 
+ * @param {string} questioner the name of the questioner
+ */
+function updateQuestionOrder(questioner) {
+    let precedenceIndex = questionPrecedence.findIndex((a) => a[0] == questioner);
+    questionPrecedence[precedenceIndex][1]++;
+    questionRecency.splice(questionRecency.indexOf(questioner), 1);
+    questionRecency.push(questioner);
+}
+
+/**
  * Converts a number of seconds to a string in the format "m:ss".
  * The inverse function of this one is {@link timeToSeconds()}.
  * 
@@ -421,6 +569,11 @@ function parsePrecedence(elementID) {
 function timeToString (time) {
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
     return minutes + ":" + seconds;
 }
 
