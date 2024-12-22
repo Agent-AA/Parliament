@@ -22,9 +22,9 @@ app.get('/admin', (req, res) => {
 //#region ----- SESSION VARIABLES AND FUNCTIONS -----
 let initialized = false;
 
-let currentMotion = "None";
+let motion = "None";
 
-let currentSpeaker = "None";
+let speaker = "None";
 let disposition = "None";
 let time = 0;
 let timePaused = false;
@@ -33,7 +33,7 @@ let speakerCount = 0;
 let affQueue = []
 let affCount = 0;
 let lastAffSpeaker = "None";
-let lastAffTime = "0:00";
+let lastAffTime = 0;
 
 let negQueue = [];
 let negCount = 0;
@@ -46,18 +46,20 @@ let lastQuestioner = "None";
 
 let speakerPrecedence = [];
 let speakerRecency = [];
+let speakerOrder = [];
 
 let questionPrecedence = [];
 let questionRecency = [];
+let questionOrder = [];
 
 //#region ----- GET and POST Requests -----
 // This is the primary update function for representatives' browsers that will be used for live polling
 app.get('/data', (req, res) => {
   let data = {
     "initialized" : initialized,
-    "motion" : currentMotion,
+    "motion" : motion,
     "speaker" : {
-      "name" : currentSpeaker,
+      "name" : speaker,
       "disposition" : disposition,
       "time" : time,
       "number" : speakerCount,
@@ -97,8 +99,8 @@ app.get('/data', (req, res) => {
 // The admin page posts updates here
 app.post('/update', (req, res) => {
   console.log(req.body);
-  currentMotion = req.body.motion;
-  currentSpeaker = req.body.speaker.name;
+  motion = req.body.motion;
+  speaker = req.body.speaker.name;
   disposition = req.body.speaker.disposition;
   timeLeft = req.body.speaker.time;
   speakerCount = req.body.speaker.number;
@@ -113,14 +115,26 @@ app.post('/update', (req, res) => {
   lastQuestioner = req.body.question.lastQuestioner;
   speakerPrecedence = req.body.speakingOrder.precedence;
   speakerRecency = req.body.speakingOrder.recency;
+  speakerOrdering = req.body.speakingOrder.ordering;
   affQueue = req.body.speakingOrder.queue.aff;
   negQueue = req.body.speakingOrder.queue.neg;
   questionPrecedence = req.body.questionOrder.precedence;
   questionRecency = req.body.questionOrder.recency;
+  questionOrdering = req.body.questionOrder.ordering;
   questionQueue = req.body.questionOrder.queue;
   
   initialized = true;
+
+  res.sendStatus(201)
 });
+
+// Stopwatch - if time is not paused, increment time every second
+setInterval(() => {
+  if (!timePaused) {
+    time++;
+  }
+}, 1000);
+
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
