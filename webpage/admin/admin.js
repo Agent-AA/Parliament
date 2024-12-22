@@ -248,6 +248,58 @@ function parseHTML() {
 
     questionPrecedence = parseList("#question-precedence", " ", "None 0");
     questionRecency = parseList("#question-recency", "", "None");
+
+    // If speaking precedence, questioning precedence, and questioning recency are empty, fill them in.
+    if (speakerPrecedence.length == 0) {
+        // every speaker should be on the precedence list with a 0
+        speakerRecency.forEach((speaker) => {
+            speakerPrecedence.push([speaker, 0]);
+        })
+
+        // the questioning recency and precedence should be in the reverse order
+        for (let i = speakerRecency.length - 1; i >= 0; i--) {
+            questionRecency.push(speakerRecency[i]);
+            questionPrecedence.push([speakerRecency[i], 0]);
+        }
+    }
+
+    speakerOrdering = speakerPrecedence;
+    // speakers who have lower numbers come before those with higher numbers
+    // and order between speakers with the same number is determine by whoever is more recent (has a lower index on the speakerRecency)
+    speakerOrdering.sort((a, b) => {
+        let aNumber = parseInt(a[1]);
+        let bNumber = parseInt(b[1]);
+        if (aNumber != bNumber) {
+            return aNumber - bNumber;
+        } else {
+            return speakerRecency.indexOf(a[0]) - speakerRecency.indexOf(b[0]);
+        }
+    });
+
+    // same thing with questioning
+    questionOrdering = questionPrecedence;
+    questionOrdering.sort((a, b) => {
+        let aNumber = parseInt(a[1]);
+        let bNumber = parseInt(b[1]);
+        if (aNumber != bNumber) {
+            return aNumber - bNumber;
+        } else {
+            return questionRecency.indexOf(a[0]) - questionRecency.indexOf(b[0]);
+        }
+    });
+
+    // Now let's sort affQueue, negQueue, and questionQueue based off of the speakerOrdering and questionOrdering
+    affQueue.sort((a, b) => {
+        return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+    });
+
+    negQueue.sort((a, b) => {
+        return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+    });
+
+    questionQueue.sort((a, b) => {
+        return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
+    });
 }
 
 /**
@@ -277,6 +329,11 @@ function updateHTML() {
         $("#question-queue").append("<li>" + questionQueue[i] + "</li>");
     }
 
+    $("#speaker-ordering").empty();
+    for (let i = 0; i < speakerOrdering.length; i++) {
+        $("#speaker-ordering").append("<li>" + speakerOrdering[i][0] + "</li>");
+    }
+
     $("#speaker-precedence").empty();
     for (let i = 0; i < speakerPrecedence.length; i++) {
         $("#speaker-precedence").append("<li>" + speakerPrecedence[i][0] + " " + speakerPrecedence[i][1] + "</li>");
@@ -285,6 +342,11 @@ function updateHTML() {
     $("#speaker-recency").empty();
     for (let i = 0; i < speakerRecency.length; i++) {
         $("#speaker-recency").append("<li>" + speakerRecency[i] + "</li>");
+    }
+
+    $("#question-ordering").empty();
+    for (let i = 0; i < questionOrdering.length; i++) {
+        $("#question-ordering").append("<li>" + questionOrdering[i][0] + "</li>");
     }
 
     $("#question-precedence").empty();
@@ -303,6 +365,7 @@ function updateHTML() {
  */
 function postUpdate() {
     parseHTML();
+    updateHTML();
     const data = {
         "motion" : $("#motion-title").text(),
         "speaker" : {
