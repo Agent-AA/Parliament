@@ -46,7 +46,7 @@ $(document).ready(() => {
             speaker = data.speaker.name;
             disposition = data.speaker.disposition;
             time = data.speaker.time;
-            timePaused = data.speaker.timePaused;
+            timePaused = data.speaker.timePaused == "true" ? true : false;
 
             number = data.speaker.number;
 
@@ -71,7 +71,7 @@ $(document).ready(() => {
 
             questionRecency = data.questionOrder.recency;
 
-            updateHTML();
+            update();
         }
     });
 });
@@ -417,12 +417,12 @@ function updateHTML() {
  */
 function postUpdate() {
     const data = {
-        "motion" : $("#motion-title").text(),
+        "motion" : motion,
         "speaker" : {
-            "name" : $("#speaker-name strong").text(),
-            "disposition": $("#speaker-disposition").text(),
-            "timeRemaining": $("#speaker-time").text(),
-            "number": $("#speaker-number").text(),
+            "name" : speaker,
+            "disposition": disposition,
+            "time": time,
+            "number": number,
             "timePaused": timePaused 
         },
         "aff": {
@@ -442,6 +442,7 @@ function postUpdate() {
         "speakingOrder": {
             "precedence": speakerPrecedence,
             "recency": speakerRecency,
+            "ordering": speakerOrdering,
             "queue": {
                 "aff": affQueue,
                 "neg": negQueue,
@@ -450,6 +451,7 @@ function postUpdate() {
         "questionOrder": {
             "precedence": questionPrecedence,
             "recency": questionRecency,
+            "ordering": questionOrdering,
             "queue": questionQueue,
         },
     };
@@ -457,7 +459,7 @@ function postUpdate() {
     $.post("/update", data);
 }
 
-function getData() {
+setInterval(() => {
     $.get("/data", (data) => {
         console.log(data);
         
@@ -473,7 +475,7 @@ function getData() {
         negQueue = data.speakingOrder.queue.neg;
         questionQueue = data.questionOrder.queue;
 
-        // Sort queues
+        // Sort queues if there's more than two queuers
         affQueue.sort((a, b) => {
             return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
         });
@@ -503,9 +505,7 @@ function getData() {
             $("#question-queue").append("<li>" + questionQueue[i] + "</li>");
         }
     });    
-}
-
-setInterval(getData(), 500);
+}, 500);
 
 /**
  * Concludes the current speaker listed on the speaker card and updates the other cards accordingly.

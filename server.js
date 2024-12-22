@@ -27,30 +27,31 @@ let motion = "None";
 let speaker = "None";
 let disposition = "None";
 let time = 0;
-let timePaused = false;
+let timer;
+let timePaused = true;
 let speakerCount = 0;
 
-let affQueue = []
+let affQueue = ['None'];
 let affCount = 0;
 let lastAffSpeaker = "None";
 let lastAffTime = 0;
 
-let negQueue = [];
+let negQueue = ['None'];
 let negCount = 0;
 let lastNegSpeaker = "None";
 let lastNegTime = 0;
 
-let questionQueue = [];
+let questionQueue = ['None'];
 let questionCount = 0;
 let lastQuestioner = "None";
 
-let speakerPrecedence = [];
-let speakerRecency = [];
-let speakerOrder = [];
+let speakerPrecedence = [['None', 0]];
+let speakerRecency = ['None'];
+let speakerOrder = ['None'];
 
-let questionPrecedence = [];
-let questionRecency = [];
-let questionOrder = [];
+let questionPrecedence = [['None', 0]];
+let questionRecency = ['None'];
+let questionOrder = ['None'];
 
 //#region ----- GET and POST Requests -----
 // This is the primary update function for representatives' browsers that will be used for live polling
@@ -62,6 +63,7 @@ app.get('/data', (req, res) => {
       "name" : speaker,
       "disposition" : disposition,
       "time" : time,
+      "timePaused" : timePaused,
       "number" : speakerCount,
     },
     "aff" : {
@@ -92,17 +94,17 @@ app.get('/data', (req, res) => {
       "queue" : questionQueue
     }
   }
-  console.log(data);
   res.send(data);
 });
 
 // The admin page posts updates here
 app.post('/update', (req, res) => {
   console.log(req.body);
+  
   motion = req.body.motion;
   speaker = req.body.speaker.name;
   disposition = req.body.speaker.disposition;
-  timeLeft = req.body.speaker.time;
+  time = req.body.speaker.time;
   speakerCount = req.body.speaker.number;
   timePaused = req.body.speaker.timePaused;
   affCount = req.body.aff.totalSpeeches;
@@ -113,27 +115,76 @@ app.post('/update', (req, res) => {
   lastNegTime = req.body.neg.speechTime;
   questionCount = req.body.question.totalQuestions;
   lastQuestioner = req.body.question.lastQuestioner;
-  speakerPrecedence = req.body.speakingOrder.precedence;
-  speakerRecency = req.body.speakingOrder.recency;
-  speakerOrdering = req.body.speakingOrder.ordering;
-  affQueue = req.body.speakingOrder.queue.aff;
-  negQueue = req.body.speakingOrder.queue.neg;
-  questionPrecedence = req.body.questionOrder.precedence;
-  questionRecency = req.body.questionOrder.recency;
-  questionOrdering = req.body.questionOrder.ordering;
-  questionQueue = req.body.questionOrder.queue;
+
+  // deal with timer. Booleans turn into strings when JSONified, so that's how we have to do it here.
+  console.log(timePaused)
+  if (timePaused == 'false') {
+    timer = setInterval(() => {
+      time++
+    }, 1000);
+  } else if (timePaused == 'true') {
+    clearInterval(timer);
+  }
   
+  // For some reason expressJS doesn't like empty arrays and won't render JSON fields with empty arrays, so we have to use try catch statements like this for arrays.
+  try {
+    speakerPrecedence = req.body.speakingOrder.precedence;
+  } catch (err) {
+    speakerPrecedence = [['None', 0]];
+  }
+
+  try {
+    speakerRecency = req.body.speakingOrder.recency;
+  } catch (err) {
+    speakerRecency = ['None'];
+  }
+
+  try {
+    speakerOrdering = req.body.speakingOrder.ordering;
+  } catch (err) {
+    speakerOrdering = ['None'];
+  }
+
+  try {
+    affQueue = req.body.speakingOrder.queue.aff;
+  } catch (err) {
+    affQueue = ['None'];
+  }
+
+  try {
+    negQueue = req.body.speakingOrder.queue.neg;
+  } catch (err) {
+    negQueue = ['None'];
+  }
+
+  try {
+    questionPrecedence = req.body.questionOrder.precedence;
+  } catch (err) {
+    questionPrecedence = [['None', 0]];
+  }
+
+  try {
+    questionRecency = req.body.questionOrder.recency;
+  } catch (err) {
+    questionRecency = ['None'];
+  }
+
+  try {
+    questionOrdering = req.body.questionOrder.ordering;
+  } catch (err) {
+    questionOrdering = ['None'];
+  }
+
+  try {
+    questionQueue = req.body.questionOrder.queue;
+  } catch (err) {
+    questionQueue = ['None'];
+  }
+    
   initialized = true;
 
   res.sendStatus(201)
 });
-
-// Stopwatch - if time is not paused, increment time every second
-setInterval(() => {
-  if (!timePaused) {
-    time++;
-  }
-}, 1000);
 
 
 app.listen(port, () => {
