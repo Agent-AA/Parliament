@@ -457,6 +457,56 @@ function postUpdate() {
     $.post("/update", data);
 }
 
+function getData() {
+    $.get("/data", (data) => {
+        console.log(data);
+        
+        // Update the time if it's not paused
+        if (!timePaused) {
+            time = data.speaker.time;
+            $("#speaker-time").text(timeToString(time));
+            $("#header-time").text(timeToString(time));
+        }
+        
+        // Update the queues
+        affQueue = data.speakingOrder.queue.aff;
+        negQueue = data.speakingOrder.queue.neg;
+        questionQueue = data.questionOrder.queue;
+
+        // Sort queues
+        affQueue.sort((a, b) => {
+            return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+        });
+    
+        negQueue.sort((a, b) => {
+            return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+        });
+    
+        questionQueue.sort((a, b) => {
+            return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
+        });
+
+        // We don't want to call the update() function, because that would meaning constantly
+        // overwriting the user's input. Instead, we just want to update the queues.
+        $("#aff-queue").empty();
+        for (let i = 0; i < affQueue.length; i++) {
+            $("#aff-queue").append("<li>" + affQueue[i] + "</li>");
+        }
+
+        $("#neg-queue").empty();
+        for (let i = 0; i < negQueue.length; i++) {
+            $("#neg-queue").append("<li>" + negQueue[i] + "</li>");
+        }
+
+        $("#question-queue").empty();
+        for (let i = 0; i < questionQueue.length; i++) {
+            $("#question-queue").append("<li>" + questionQueue[i] + "</li>");
+        }
+    });    
+}
+
+setInterval(getData(), 500);
+
 /**
  * Concludes the current speaker listed on the speaker card and updates the other cards accordingly.
  */
