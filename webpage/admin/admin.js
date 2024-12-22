@@ -173,41 +173,47 @@ $("#pause-button").click(() => {
 // when the "end speech button is clicked," perform some operations
 // and then update the server.
 $("#end-button").click(() => {
-    // Update global variables
-    parseHTML();
-    switch ($("#speaker-disposition").text()) {
-        case "Affirmative" :
-            affTotalSpeeches++;
-            affLastSpeaker = $("#speaker-name").text();
-            affSpeechTime = $("#speaker-time").text();
-            updateOrdering($("#speaker-name").text(), "speaker");
-            break;
-        case "Negative" :
-            negTotalSpeeches++;
-            negLastSpeaker = $("#speaker-name").text();
-            negSpeechTime = $("#speaker-time").text();
-            updateOrdering($("#speaker-name").text(), "speaker");
-            break;
-        case "Question" :
-            questionCount++;
-            lastQuestioner = $("#speaker-name").text();
-            updateOrdering($("#speaker-name").text(), "question");
-            break;
+    concludeSpeaker();
+});
+
+$("#question-button").click(() => {
+    
+    if ($("#speaker-disposition").text() != "None") {
+        concludeSpeaker();
+    } else {
+        parseHTML();
     }
 
-    // Clear the speaker card
-    $("#speaker-name").text("None");
-    $("#speaker-disposition").text("None");
-    $("#speaker-time").text("0:00");
-    let nextSpeakerNumber = affTotalSpeeches + 1;
-    nextSpeakerNumber += negTotalSpeeches;
-    $("#speaker-number").text("Speaker " + nextSpeakerNumber);
-    timePaused = true;
+    // remove the top questioner from the question queue and put them as the speaker.
+    $("#speaker-name").text(questionQueue.shift());
+    $("#speaker-disposition").text("Question");
 
-    // Update HTML
+    timePaused = false;
     updateHTML();
+    postUpdate();
+});
 
-    // Post an update to the server.
+$("aff-button").click(() => {
+
+    // remove the top aff speaker from the aff queue and put them as the speaker.
+    $("#speaker-name").text(affQueue.shift());
+    $("#speaker-disposition").text("Affirmative");
+
+    timePaused = true;
+    parseHTML();
+    updateHTML();
+    postUpdate();
+});
+
+$("#neg-button").click(() => {
+
+    // remove the top neg speaker from the neg queue and put them as the speaker.
+    $("#speaker-name").text(negQueue.shift());
+    $("#speaker-disposition").text("Negative");
+
+    timePaused = true;
+    parseHTML();
+    updateHTML();
     postUpdate();
 });
 //#endregion
@@ -239,15 +245,11 @@ function parseHTML() {
     questionCount = parseInt($("#question-count").text());
     lastQuestioner = $("#question-last").text();
 
-    affQueue = parseList("#aff-queue", "", "None");
-    neqQueue = parseList("#neg-queue", "", "None");
-    questionQueue = parseList("#question-queue", "", "None");
+    speakerPrecedence = parseList("#speaker-precedence", "None 0", " ");
+    speakerRecency = parseList("#speaker-recency", "None", " ");
 
-    speakerPrecedence = parseList("#speaker-precedence", " ", "None 0");
-    speakerRecency = parseList("#speaker-recency", "", "None");
-
-    questionPrecedence = parseList("#question-precedence", " ", "None 0");
-    questionRecency = parseList("#question-recency", "", "None");
+    questionPrecedence = parseList("#question-precedence", "None 0", " ");
+    questionRecency = parseList("#question-recency", "None", " ");
 
     // If speaking precedence, questioning precedence, and questioning recency are empty, fill them in.
     if (speakerPrecedence.length == 0) {
@@ -289,6 +291,16 @@ function parseHTML() {
     });
 
     // Now let's sort affQueue, negQueue, and questionQueue based off of the speakerOrdering and questionOrdering
+    // first, we need to make speakerOrdering and questionOrdering into arrays of just the names
+    speakerOrdering = speakerOrdering.map((item) => {
+        return item[0];
+    });
+
+    questionOrdering = questionOrdering.map((item) => {
+        return item[0];
+    });
+    
+    // Then we can sort
     affQueue.sort((a, b) => {
         return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
     });
@@ -307,6 +319,11 @@ function parseHTML() {
  * based on the global variables.
  */
 function updateHTML() {
+
+    $("#header-name").text($("#speaker-name").text());
+    $("#header-time").text($("#speaker-time").text());
+    $("#header-disposition").text($("#speaker-disposition").text());
+
     $("#aff-count").text(affTotalSpeeches);
     $("#aff-last").text(affLastSpeaker + " (" + affSpeechTime + ")");
     $("#neg-count").text(negTotalSpeeches);
@@ -331,7 +348,7 @@ function updateHTML() {
 
     $("#speaker-ordering").empty();
     for (let i = 0; i < speakerOrdering.length; i++) {
-        $("#speaker-ordering").append("<li>" + speakerOrdering[i][0] + "</li>");
+        $("#speaker-ordering").append("<li>" + speakerOrdering[i] + "</li>");
     }
 
     $("#speaker-precedence").empty();
@@ -346,7 +363,7 @@ function updateHTML() {
 
     $("#question-ordering").empty();
     for (let i = 0; i < questionOrdering.length; i++) {
-        $("#question-ordering").append("<li>" + questionOrdering[i][0] + "</li>");
+        $("#question-ordering").append("<li>" + questionOrdering[i] + "</li>");
     }
 
     $("#question-precedence").empty();
@@ -417,22 +434,26 @@ function postUpdate() {
  * Parses an unordered list element and returns an array of the listed items.
  * 
  * @param {string} elementID the id attribute of the list element
- * @param {string} delimiter a delimiter to split the text of a list item, if necessary.
  * @param {string} placeholder a placeholder text list item to ignore. If no filler, pass "".
+ * @param {string?} delimiter a delimiter to split the text of a list item, if necessary.
  * 
  * @returns {Array<string>} the list of items in the list element
  */
-function parseList(elementID, delimiter, placeholder) {
+function parseList(elementID, placeholder, delimiter) {
     let list = [];
-    $(elementID + " li").each((index, element) => {
-        if (element.innerText != placeholder) {
-            if (delimiter != "") {
-                list.push(element.innerText.split(delimiter));
-            } else {
+    if (delimiter == undefined) {
+        $(elementID + " li").each((index, element) => {
+            if (element.innerText != placeholder) {
                 list.push(element.innerText);
             }
-        }
-    })
+        });
+    } else {
+        $(elementID + " li").each((index, element) => {
+            if (element.innerText != placeholder) {
+                list.push(element.innerText.split(delimiter));
+            }
+        });
+    }
 
     return list;
 }
@@ -490,5 +511,38 @@ function updatePrecedence(array, item) {
     array.sort((a, b) => {
         return a[1] - b[1];
     });
+}
+
+/**
+ * Concludes the current speaker.
+ */
+function concludeSpeaker() {
+    parseHTML();
+    switch ($("#speaker-disposition").text()) {
+        case "Affirmative" :
+            affTotalSpeeches++;
+            affLastSpeaker = $("#speaker-name").text();
+            affSpeechTime = $("#speaker-time").text();
+            updateOrdering($("#speaker-name").text(), "speaker");
+            break;
+        case "Negative" :
+            negTotalSpeeches++;
+            negLastSpeaker = $("#speaker-name").text();
+            negSpeechTime = $("#speaker-time").text();
+            updateOrdering($("#speaker-name").text(), "speaker");
+            break;
+        case "Question" :
+            questionCount++;
+            lastQuestioner = $("#speaker-name").text();
+            updateOrdering($("#speaker-name").text(), "question");
+            break;
+    }
+
+    $("#speaker-name").text("None");
+    $("#speaker-disposition").text("None");
+    $("#speaker-time").text("0:00");
+
+    updateHTML();
+    postUpdate();
 }
 //#endregion

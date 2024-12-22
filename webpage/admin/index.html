@@ -15,11 +15,9 @@
         <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"><i class="fa fa-gavel"></i></span><span>Parliament</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="#motion">Motion</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#speaker">Speaker</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#actions">Actions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#order">Order</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contacts.html"></a></li>
+                    <li class="nav-item"><a id="header-name" class="nav-link" href="#">None</a></li>
+                    <li class="nav-item"><a id="header-time" class="nav-link" href="#">0:00</a></li>
+                    <li class="nav-item"><a id="header-disposition" class="nav-link" href="#">None</a></li>
                 </ul>
             </div>
         </div>
@@ -44,7 +42,6 @@
             </div>
         </div>
     </header>
-    <section></section>
     <section>
         <div class="container" id="speaker" style="background: rgb(39,38,46);margin: 48px auto 24px auto;padding: 24px;border-radius: 16px;max-width: 60%;">
             <div class="row">
@@ -104,16 +101,29 @@
             <div class="mx-auto" style="max-width: 900px;">
                 <div class="row row-cols-1 row-cols-md-2 d-flex justify-content-center">
                     <div class="col mb-4">
+                        <div class="card bg-info-light">
+                            <div class="card-body text-center px-4 py-5 px-md-5">
+                                <p class="fw-bold text-info card-text mb-2">Questioning</p>
+                                <h5 id="question-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
+                                <h5 id="question-last" class="fw-bold card-title mb-3" contenteditable="true">None</h5>
+                                <p class="fw-bold text-info card-text mb-2">Queued Questioners</p>
+                                <ul id="question-queue" class="list-unstyled">
+                                    <li>None</li>
+                                </ul><button id="question-button" class="btn btn-info btn-sm" type="button">Recognize Next Question</button>
+                                <h6 class="text-info card-title mb-3" style="margin-top: 12px;">(Begins immediately)</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col mb-4">
                         <div class="card bg-primary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-primary card-text mb-2">Affirmative Speeches</p>
                                 <h5 id="aff-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
                                 <h5 id="aff-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
                                 <p class="fw-bold text-primary card-text mb-2">Queued Speakers</p>
-                                <ul id="aff-queue" class="list-unstyled" contenteditable="true">
+                                <ul id="aff-queue" class="list-unstyled">
                                     <li>None</li>
-                                </ul><button class="btn btn-primary btn-sm" type="button">Recognize Next Aff</button>
-                                <button class="btn btn-primary btn-sm" style="margin-left: 6px" type="button">Reorder</button>
+                                </ul><button id="aff-button" class="btn btn-primary btn-sm" type="button">Recognize Next Aff</button>
                             </div>
                         </div>
                     </div>
@@ -124,24 +134,9 @@
                                 <h5 id="neg-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
                                 <h5 id="neg-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
                                 <p class="fw-bold text-secondary card-text mb-2">Queued Speakers</p>
-                                <ul id="neg-queue" class="list-unstyled" contenteditable="true">
+                                <ul id="neg-queue" class="list-unstyled">
                                     <li>None</li>
-                                </ul><button class="btn btn-secondary btn-sm" type="button">Recognize Next Neg</button>
-                                <button class="btn btn-secondary btn-sm" style="margin-left: 6px" type="button">Reorder</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col mb-4">
-                        <div class="card bg-info-light">
-                            <div class="card-body text-center px-4 py-5 px-md-5">
-                                <p class="fw-bold text-info card-text mb-2">Questioning</p>
-                                <h5 id="question-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="question-last" class="fw-bold card-title mb-3" contenteditable="true">None</h5>
-                                <p class="fw-bold text-info card-text mb-2">Queued Questioners</p>
-                                <ul contenteditable="true" id="question-queue" class="list-unstyled">
-                                    <li>None</li>
-                                </ul><button class="btn btn-info btn-sm" type="button">Recognize Next Question</button>
-                                <button class="btn btn-info btn-sm" style="margin-left: 6px" type="button">Reorder</button>
+                                </ul><button id="neg-button" class="btn btn-secondary btn-sm" type="button">Recognize Next Neg</button>
                             </div>
                         </div>
                     </div>
