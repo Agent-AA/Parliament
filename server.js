@@ -26,7 +26,7 @@ let currentMotion = "None";
 
 let currentSpeaker = "None";
 let disposition = "None";
-let timeLeft = "0:00";
+let time = 0;
 let timePaused = false;
 let speakerCount = 0;
 
@@ -38,7 +38,7 @@ let lastAffTime = "0:00";
 let negQueue = [];
 let negCount = 0;
 let lastNegSpeaker = "None";
-let lastNegTime = "0:00";
+let lastNegTime = 0;
 
 let questionQueue = [];
 let questionCount = 0;
@@ -59,7 +59,7 @@ app.get('/data', (req, res) => {
     "speaker" : {
       "name" : currentSpeaker,
       "disposition" : disposition,
-      "timeRemaining" : timeLeft,
+      "time" : time,
       "number" : speakerCount,
     },
     "aff" : {
@@ -100,7 +100,7 @@ app.post('/update', (req, res) => {
   currentMotion = req.body.motion;
   currentSpeaker = req.body.speaker.name;
   disposition = req.body.speaker.disposition;
-  timeLeft = req.body.speaker.timeRemaining;
+  timeLeft = req.body.speaker.time;
   speakerCount = req.body.speaker.number;
   timePaused = req.body.speaker.timePaused;
   affCount = req.body.aff.totalSpeeches;

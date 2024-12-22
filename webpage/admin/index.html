@@ -29,7 +29,7 @@
                     <div class="text-center">
                         <div style="text-align: center;">
                             <p class="fw-bold text-success mb-2">Current Motion</p>
-                            <h1 id="motion-title" class="fw-bold" contenteditable="true" style="margin: 0px 0px 24px;">None</h1><button id="update-motion-button" class="btn btn-primary" type="button" style="color: rgb(39, 38, 46);background: var(--bs-success);">Update</button>
+                            <h1 id="motion-title" class="fw-bold" contenteditable="true" style="margin: 0px 0px 24px;">None</h1>
                         </div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
             <div class="row">
                 <div class="col">
                     <h1 style="text-align: center;"></h1>
-                    <h1 style="text-align: center;" contenteditable="true"><strong id="speaker-name">None</strong></h1>
+                    <h1 id="speaker-name" class="fw-bold" style="text-align: center;" contenteditable="true">None</h1>
                     <div></div>
                 </div>
             </div>
@@ -119,7 +119,7 @@
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-primary card-text mb-2">Affirmative Speeches</p>
                                 <h5 id="aff-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="aff-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
+                                <h5 id="aff-last" class="fw-bold card-title mb-3" contenteditable="true">None 0:00</h5>
                                 <p class="fw-bold text-primary card-text mb-2">Queued Speakers</p>
                                 <ul id="aff-queue" class="list-unstyled">
                                     <li>None</li>
@@ -132,7 +132,7 @@
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-secondary card-text mb-2">Negative Speeches</p>
                                 <h5 id="neg-count" class="fw-bold card-title mb-3" contenteditable="true">0</h5>
-                                <h5 id="neg-last" class="fw-bold card-title mb-3" contenteditable="true">None (0:00)</h5>
+                                <h5 id="neg-last" class="fw-bold card-title mb-3" contenteditable="true">None 0:00</h5>
                                 <p class="fw-bold text-secondary card-text mb-2">Queued Speakers</p>
                                 <ul id="neg-queue" class="list-unstyled">
                                     <li>None</li>
@@ -205,7 +205,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <p style="text-align: center;">Representatives are listed in order from highest priority at the top to lower priority at the bottom. Representatives tied in precedence are listed in no particular order. Bolded representatives have queued to speak or question.</p>
+                    <p style="text-align: center;">Representatives are listed in order from highest priority at the top to lower priority at the bottom. Representatives tied in precedence are listed alphabetically.</p>
                 </div>
             </div>
         </div>

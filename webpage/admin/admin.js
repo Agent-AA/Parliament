@@ -1,11 +1,16 @@
 //#region ----- Global Variables -----
+let motion = "None";
+let speaker = "None";
+let disposition = "None";
+let time = 0;
+let number = 1;
 let timePaused = true;
 let affTotalSpeeches = 0;
 let affLastSpeaker = "None";
-let affSpeechTime = "0:00";
+let affSpeechTime = 0;
 let negTotalSpeeches = 0;
 let negLastSpeaker = "None";
-let negSpeechTime = "0:00";
+let negSpeechTime = 0;
 let questionCount = 0;
 let lastQuestioner = "None";
 let speakerPrecedence = [];
@@ -37,224 +42,139 @@ let questionQueue = [];
 $(document).ready(() => {
     $.get("/data", (data) => {
         if (data.initialized) {
-            $("#motion-title").text(data.motion);
-            $("#speaker-name").text(data.speaker.name);
-            $("#speaker-disposition").text(data.speaker.disposition);
-            $("#speaker-time").text(data.speaker.timeRemaining);
+            motion = data.motion;
+            speaker = data.speaker.name;
+            disposition = data.speaker.disposition;
+            time = data.speaker.time;
             timePaused = data.speaker.timePaused;
 
-            $("#speaker-number").text(data.speaker.number,);
+            number = data.speaker.number;
 
             affTotalSpeeches = data.aff.totalSpeeches;
-            $("#aff-count").text(data.aff.totalSpeeches);
             affLastSpeaker = data.aff.lastSpeaker;
-            $("#aff-last").text(
-                data.aff.lastSpeaker +
-                    " (" +
-                    data.aff.speechTime +
-                    ")",
-            );
 
             affQueue = data.speakingOrder.queue.aff;
-            $("#aff-queue").empty();
-            for (
-                let i = 0;
-                i < data.speakingOrder.queue.aff.length;
-                i++
-            ) {
-                $("#aff-queue").append(
-                    "<li>" + data.speakingOrder.queue.aff[i] + "</li>",
-                );
-            }
 
             negTotalSpeeches = data.neg.totalSpeeches;
-            $("#neg-count").text(data.neg.totalSpeeches);
             negLastSpeaker = data.neg.lastSpeaker;
-            $("#neg-last").text(
-                data.neg.lastSpeaker +
-                    " (" +
-                    data.neg.speechTime +
-                    ")",
-            );
+
             negQueue = data.speakingOrder.queue.neg;
-            $("#neg-queue").empty();
-            for (
-                let i = 0;
-                i < data.speakingOrder.queue.neg.length;
-                i++
-            ) {
-                $("#neg-queue").append(
-                    "<li>" + data.speakingOrder.queue.neg[i] + "</li>",
-                );
-            }
 
             questionCount = data.question.totalQuestions;
-            $("#question-count").text(data.question.totalQuestions);
             lastQuestioner = data.question.lastQuestioner;
-            $("#question-last").text(data.question.lastQuestioner);
             questionQueue = data.questionOrder.queue;
-            $("#question-queue").empty();
-            for (let i = 0; i < data.questionOrder.queue.length; i++) {
-                $("#question-queue").append(
-                    "<li>" + data.questionOrder.queue[i] + "</li>",
-                );
-            }
 
             speakerPrecedence = data.speakingOrder.precedence;
-            $("#speaker-precedence").empty();
-            for (
-                let i = 0;
-                i < data.speakingOrder.precedence.length;
-                i++
-            ) {
-                $("#speaker-precedence").append(
-                    "<li>" +
-                        data.speakingOrder.precedence[i][0] +
-                        " " +
-                        data.speakingOrder.precedence[i][1] +
-                        "</li>",
-                );
-            }
-
             speakerRecency = data.speakingOrder.recency;
-            $("#speaker-recency").empty();
-            for (
-                let i = 0;
-                i < data.speakingOrder.recency.length;
-                i++
-            ) {
-                $("#speaker-recency").append(
-                    "<li>" + data.speakingOrder.recency[i] + "</li>",
-                );
-            }
-
             questionPrecedence = data.questionOrder.precedence;
-            $("#question-precedence").empty();
-            for (
-                let i = 0;
-                i < data.questionOrder.precedence.length;
-                i++
-            ) {
-                $("#question-precedence").append(
-                    "<li>" +
-                        data.questionOrder.precedence[i][0] +
-                        " " +
-                        data.questionOrder.precedence[i][1] +
-                        "</li>",
-                );
-            }
+
 
             questionRecency = data.questionOrder.recency;
-            $("#question-recency").empty();
-            for (
-                let i = 0;
-                i < data.questionOrder.recency.length;
-                i++
-            ) {
-                $("#question-recency").append(
-                    "<li>" + data.questionOrder.recency[i] + "</li>",
-                );
-            }
+
+            updateHTML();
         }
     });
 });
 
-// when the "update" button at the top of the page is clicked, update the server
-$("#update-motion-button").click(() => {
-    postUpdate();
+
+
+//#region Editing Events
+// Motion title
+$("#motion-title").focusout(() => {
+    motion = $("#motion-title").text();
+    update();
 });
 
+// Speaker
+$("#speaker-name").focusout(() => {
+    speaker = $("#speaker-name").text();
+    update();
+});
+
+// Speaker side
+$("#speaker-disposition").focusout(() => {
+    disposition = $("#speaker-disposition").text();
+    update();
+});
+
+// Speaker time
+$("#speaker-time").focusout(() => {
+    time = timeToSeconds($("#speaker-time").text());
+    update();
+});
+
+// Question count
+$("#question-count").focusout(() => {
+    questionCount = parseInt($("#question-count").text());
+    update();
+});
+
+// Last questioner
+$("#question-last").focusout(() => {
+    lastQuestioner = $("#question-last").text();
+    update();
+});
+
+// Affirmative speech count
+$("#aff-count").focusout(() => {
+    affTotalSpeeches = parseInt($("#aff-count").text());
+    update();
+});
+
+// Affirmative last speaker and time
+$("#aff-last").focusout(() => {
+    let split = $("#aff-last").text().split(" ");
+    affLastSpeaker = split[0];
+    affSpeechTime = timeToSeconds(split[1]);
+    update();
+});
+
+// Negative speech count
+$("#neg-count").focusout(() => {
+    negTotalSpeeches = parseInt($("#neg-count").text());
+    update();
+});
+
+// Negative last speaker and time
+$("#neg-last").focusout(() => {
+    let split = $("#neg-last").text().split(" ");
+    negLastSpeaker = split[0];
+    negSpeechTime = timeToSeconds(split[1]);
+    update();
+});
+
+// Speaking precedence
+$("#speaker-precedence").focusout(() => {
+    speakerPrecedence = parsePrecedence("#speaker-precedence");
+    update();
+});
+
+// Speaking recency
+$("#speaker-recency").focusout(() => {
+    speakerRecency = ParseRecency("#speaker-recency");
+    update();
+});
+
+// Question precedence
+$("#question-precedence").focusout(() => {
+    questionPrecedence = parsePrecedence("#question-precedence");
+    update();
+});
+
+// Question recency
+$("#question-recency").focusout(() => {
+    questionRecency = ParseRecency("#question-recency");
+    update();
+});
+//#endregion
+
+
+//#region Button Events
 // when the "start / stop time button" is clicked, pause or unpause the timer and update server
 $("#pause-button").click(() => {
     timePaused = !timePaused;
     postUpdate();
 });
-
-// when the "end speech button is clicked," perform some operations
-// and then update the server.
-$("#end-button").click(() => {
-    concludeSpeaker();
-});
-
-$("#question-button").click(() => {
-    
-    if ($("#speaker-disposition").text() != "None") {
-        concludeSpeaker();
-    } else {
-        parseHTML();
-    }
-
-    // remove the top questioner from the question queue and put them as the speaker.
-    $("#speaker-name").text(questionQueue.shift());
-    $("#speaker-disposition").text("Question");
-
-    timePaused = false;
-    updateHTML();
-    postUpdate();
-});
-
-$("aff-button").click(() => {
-
-    // remove the top aff speaker from the aff queue and put them as the speaker.
-    $("#speaker-name").text(affQueue.shift());
-    $("#speaker-disposition").text("Affirmative");
-
-    timePaused = true;
-    parseHTML();
-    updateHTML();
-    postUpdate();
-});
-
-$("#neg-button").click(() => {
-
-    // remove the top neg speaker from the neg queue and put them as the speaker.
-    $("#speaker-name").text(negQueue.shift());
-    $("#speaker-disposition").text("Negative");
-
-    timePaused = true;
-    parseHTML();
-    updateHTML();
-    postUpdate();
-});
-
-// SHORTCUTS
-// shortcut to update to server is ctrl + enter
-$(document).keydown((event) => {
-    if (event.ctrlKey && event.key == "Enter") {
-        parseHTML();
-        updateHTML();
-        postUpdate();
-    }
-});
-
-// shortcut to pause time is ctrl + space
-$(document).keydown((event) => {
-    if (event.ctrlKey && event.key == " ") {
-        timePaused = !timePaused;
-        parseHTML();
-        updateHTML();
-        postUpdate();
-    }
-});
-
-// shortcut to conclude speaker is ctrl + c
-$(document).keydown((event) => {
-    if (event.ctrlKey && event.key == "c") {
-
-        concludeSpeaker();
-    }
-});
-
-// shortcut to recognize next questioner is ctrl + q
-$(document).keydown((event) => {
-    if (event.ctrlKey && event.key == "q") {
-        if ($("#speaker-disposition").text() != "None") {
-            concludeSpeaker();
-        }
-    }
-});
-
-
 //#endregion
 
 
@@ -262,84 +182,62 @@ $(document).keydown((event) => {
 
 
 //#region ----- Main Functions -----
-/**
-* <p>In order to keep the admin dashboard intuitive and easy to use, elements are made
-* contenteditable, there is not event listener on these objects. Thus, parsing is where 
-* the data on the html page is parsed and stored in the javascript code, usually before being posted
-* to a server update. This also reorganizes some other things like the queues if they happen to be out of
-* order.</p>
-*
-* <p> Some items are not included in the global variables, and thus do not need to be dealt with in this
-* function. These items include variables that can be pulled directly from the html page without
-* parsing, like the motion title, speaker, speaker disposition, and speaker number (which can be calculated
-* by from the number of previous speeches).</p>
+
+/*
+* Wrapper function for updating data on both the webpage and server. It also
+* sorts the queues and orders.
 */
-function parseHTML() {
-    affTotalSpeeches = parseInt($("#aff-count").text());
-    affLastSpeaker = $("#aff-last").text().split(" ")[0];
-    affSpeechTime = $("#aff-last").text().split(" ")[1].slice(1, -1);
-    negTotalSpeeches = parseInt($("#neg-count").text());
-    negLastSpeaker = $("#neg-last").text().split(" ")[0];
-    negSpeechTime = $("#neg-last").text().split(" ")[1].slice(1, -1);
-    questionCount = parseInt($("#question-count").text());
-    lastQuestioner = $("#question-last").text();
+function update() {
 
-    speakerPrecedence = parseList("#speaker-precedence", "None 0", " ");
-    speakerRecency = parseList("#speaker-recency", "None", " ");
-
-    questionPrecedence = parseList("#question-precedence", "None 0", " ");
-    questionRecency = parseList("#question-recency", "None", " ");
-
-    // If speaking precedence, questioning precedence, and questioning recency are empty, fill them in.
+    // If any of the ordering lists are blank, autofill them based off of speaker recency.
     if (speakerPrecedence.length == 0) {
-        // every speaker should be on the precedence list with a 0
-        speakerRecency.forEach((speaker) => {
-            speakerPrecedence.push([speaker, 0]);
-        })
-
-        // the questioning recency and precedence should be in the reverse order
-        for (let i = speakerRecency.length - 1; i >= 0; i--) {
-            questionRecency.push(speakerRecency[i]);
-            questionPrecedence.push([speakerRecency[i], 0]);
-        }
+        speakerPrecedence = speakerRecency.map((a) => [a, 0]);
+    } if (questionRecency.length == 0) {
+        speakerRecency.forEach((a) => {
+            questionRecency.unshift(a);
+        });
+    } if (questionPrecedence.length == 0) {
+        questionPrecedence = questionRecency.map((a) => [a, 0]);
     }
 
-    speakerOrdering = speakerPrecedence;
-    // speakers who have lower numbers come before those with higher numbers
-    // and order between speakers with the same number is determine by whoever is more recent (has a lower index on the speakerRecency)
-    speakerOrdering.sort((a, b) => {
-        let aNumber = parseInt(a[1]);
-        let bNumber = parseInt(b[1]);
-        if (aNumber != bNumber) {
-            return aNumber - bNumber;
+    // Then sort the lists. First the precence, then the ordering.
+    // Recency will always already be sorted.
+    speakerPrecedence.sort((a, b) => {
+        if (a[1] == b[1]) {
+            // sort alphabetically
+            return a[0] > b[0] ? 1 : -1;
         } else {
+            return a[1] - b[1];
+        }
+    });
+
+    // Ordering is by precedence and then recency
+    speakerOrdering = speakerPrecedence;
+    speakerOrdering.sort((a, b) => {
+        if (a[1] == b[1]) {
             return speakerRecency.indexOf(a[0]) - speakerRecency.indexOf(b[0]);
         }
     });
+    // Remove the precedence value.
+    speakerOrdering = speakerOrdering.map((a) => a[0]);
 
-    // same thing with questioning
-    questionOrdering = questionPrecedence;
-    questionOrdering.sort((a, b) => {
-        let aNumber = parseInt(a[1]);
-        let bNumber = parseInt(b[1]);
-        if (aNumber != bNumber) {
-            return aNumber - bNumber;
+    questionPrecedence.sort((a, b) => {
+        if (a[1] == b[1]) {
+            // sort alphabetically
+            return a[0] > b[0] ? 1 : -1;
         } else {
-            return questionRecency.indexOf(a[0]) - questionRecency.indexOf(b[0]);
+            return a[1] - b[1];
         }
     });
 
-    // Now let's sort affQueue, negQueue, and questionQueue based off of the speakerOrdering and questionOrdering
-    // first, we need to make speakerOrdering and questionOrdering into arrays of just the names
-    speakerOrdering = speakerOrdering.map((item) => {
-        return item[0];
+    questionOrdering = questionPrecedence;
+    questionOrdering.sort((a, b) => {
+        if (a[1] == b[1]) {
+            return questionRecency.indexOf(a[0]) - questionRecency.indexOf(b[0]);
+        }
     });
+    questionOrdering = questionOrdering.map((a) => a[0]);
 
-    questionOrdering = questionOrdering.map((item) => {
-        return item[0];
-    });
-    
-    // Then we can sort
     affQueue.sort((a, b) => {
         return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
     });
@@ -351,22 +249,30 @@ function parseHTML() {
     questionQueue.sort((a, b) => {
         return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
     });
+
+    // Finally, update the webpage and server.
+    updateHTML();
+    postUpdate();
 }
 
 /**
- * This does the functional opposite of {@link parseHTML()}. It updates html elements
- * based on the global variables.
+ * Updates the HTML on the admin page to reflect the current global variables.
  */
 function updateHTML() {
 
-    $("#header-name").text($("#speaker-name").text());
-    $("#header-time").text($("#speaker-time").text());
-    $("#header-disposition").text($("#speaker-disposition").text());
+    $("#motion-title").text(motion);
+    $("#speaker-name").text(speaker);
+    $("#speaker-time").text(timeToString(time));
+    $("#speaker-number").text(number);
+
+    $("#header-name").text(speaker);
+    $("#header-time").text(timeToString(time));
+    $("#header-disposition").text(disposition);
 
     $("#aff-count").text(affTotalSpeeches);
-    $("#aff-last").text(affLastSpeaker + " (" + affSpeechTime + ")");
+    $("#aff-last").text(affLastSpeaker + " " + timeToString(affSpeechTime));
     $("#neg-count").text(negTotalSpeeches);
-    $("#neg-last").text(negLastSpeaker + " (" + negSpeechTime + ")");
+    $("#neg-last").text(negLastSpeaker + " " + timeToString(negSpeechTime));
     $("#question-count").text(questionCount);
     $("#question-last").text(lastQuestioner);
 
@@ -414,14 +320,14 @@ function updateHTML() {
     for (let i = 0; i < questionRecency.length; i++) {
         $("#question-recency").append("<li>" + questionRecency[i] + "</li>");
     }
+
+
 }
 
 /**
  * Calibrates and then posts all data to the server.
  */
 function postUpdate() {
-    parseHTML();
-    updateHTML();
     const data = {
         "motion" : $("#motion-title").text(),
         "speaker" : {
@@ -470,118 +376,64 @@ function postUpdate() {
 
 //#region ----- Helper Functions
 /**
- * Parses an unordered list element and returns an array of the listed items.
+ * Parses an unstyled list element representing a recency order and returns an array of the listed items.
  * 
  * @param {string} elementID the id attribute of the list element
- * @param {string} placeholder a placeholder text list item to ignore. If no filler, pass "".
- * @param {string?} delimiter a delimiter to split the text of a list item, if necessary.
  * 
  * @returns {Array<string>} the list of items in the list element
  */
-function parseList(elementID, placeholder, delimiter) {
+function ParseRecency(elementID) {
     let list = [];
-    if (delimiter == undefined) {
-        $(elementID + " li").each((index, element) => {
-            if (element.innerText != placeholder) {
-                list.push(element.innerText);
-            }
+    $(elementID + " li").each((index, element) => {
+        if (element.innerText != "None") {
+            list.push(element.innerText);
+        }
         });
-    } else {
-        $(elementID + " li").each((index, element) => {
-            if (element.innerText != placeholder) {
-                list.push(element.innerText.split(delimiter));
-            }
-        });
-    }
 
     return list;
 }
 
 /**
- * Updates the overall ordering of speakers by adjusting precedence and recency.
+ * Parses an unstyled list element representing a precedence order and returns an array of the listed items.
  * 
- * @param {string} item the item to update ordering for.
- * @param {string} type the type of item to update. Should be either "speaker" or "question".
- */
-function updateOrdering(item, type) {
-   if (type == "speaker") {
-        updateRecency(speakerRecency, item);
-        updatePrecedence(speakerPrecedence, item);
-    } else {
-        updateRecency(questionRecency, item);
-        updatePrecedence(questionPrecedence, item);
-    }
-}
-
-/**
- * Updates a recency list by returning the
- * passed item to the end of the list.
+ * @param {string} elementID the id attribute of the list element
  * 
- * @param {Array<string>} array the recency array to update. Should be either {@link speakerRecency} or {@link questionRecency}.
- * @param {string} item the item to update.
+ * @returns {Array<string>} the list of items in the list element, formatted as [{string} item, {number} precedence];
  */
-function updateRecency(array, item) {
-    let index = array.indexOf(item);
-    if (index != -1) {
-        array.splice(index, 1);
-    }
-    array.push(item);
-}
-
-/**
- * Updates a precedence list by incrementing the
- * second element of the passed item in the array
- * @param {Array<string>} array the precedence array to update. Should be either {@link speakerPrecedence} or {@link questionPrecedence}.
- * @param {string} item the item to update.
- */
-function updatePrecedence(array, item) {
-    console.log(array);
-    console.log(item);
-
-    // find the array whose first element is the item, and increment
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][0] == item) {
-            array[i][1]++;;
-            break;
-        }
-    }
-
-    // Sort the array by the second element
-    array.sort((a, b) => {
-        return a[1] - b[1];
+function parsePrecedence(elementID) {
+    let list = [];
+    $(elementID + " li").each((index, element) => {
+        let split = element.innerText.split(" ");
+        list.push([split[0], parseInt(split[1])]);
     });
+
+    return list;
 }
 
 /**
- * Concludes the current speaker.
+ * Converts a number of seconds to a string in the format "m:ss".
+ * The inverse function of this one is {@link timeToSeconds()}.
+ * 
+ * @param {number} time the time in seconds to convert.
+ * 
+ * @returns a string in the format "m:ss"
  */
-function concludeSpeaker() {
-    parseHTML();
-    switch ($("#speaker-disposition").text()) {
-        case "Affirmative" :
-            affTotalSpeeches++;
-            affLastSpeaker = $("#speaker-name").text();
-            affSpeechTime = $("#speaker-time").text();
-            updateOrdering($("#speaker-name").text(), "speaker");
-            break;
-        case "Negative" :
-            negTotalSpeeches++;
-            negLastSpeaker = $("#speaker-name").text();
-            negSpeechTime = $("#speaker-time").text();
-            updateOrdering($("#speaker-name").text(), "speaker");
-            break;
-        case "Question" :
-            questionCount++;
-            lastQuestioner = $("#speaker-name").text();
-            updateOrdering($("#speaker-name").text(), "question");
-            break;
-    }
+function timeToString (time) {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    return minutes + ":" + seconds;
+}
 
-    $("#speaker-name").text("None");
-    $("#speaker-disposition").text("None");
-    $("#speaker-time").text("0:00");
-
-    updateHTML();
-    postUpdate();
+/**
+ * Converst a string in the format "m:ss" to a number of seconds
+ * The inverse function of this one is {@link timeToString()}.
+ * 
+ * @param {string} time the time in the format "m:ss" to convert.
+ * 
+ * @returns a number of seconds
+ */
+function timeToSeconds (time) {
+    let split = time.split(":");
+    return parseInt(split[0]) * 60 + parseInt(split[1]);
 }
 //#endregion
