@@ -21,7 +21,7 @@
                     <li class="nav-item"><a class="nav-link" href="/pricing.html">Order</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacts.html"></a></li>
                 </ul>
-            </div><input type="text" style="background: rgb(39,38,46);border-style: none;border-radius: 10px;padding: 1px 2px 1px 10px;font-weight: bold;color: white;" placeholder="Name">
+            </div><input id="name-input" type="text" style="background: rgb(39,38,46);border-style: none;border-radius: 10px;padding: 1px 2px 1px 10px;font-weight: bold;color: white;" placeholder="Name">
         </div>
     </nav>
     <header class="bg-dark">
@@ -30,7 +30,7 @@
                 <div class="col-md-8 col-xl-6 text-center text-md-start mx-auto" style="padding: 0px 12px 12px 12px;">
                     <div class="text-center">
                         <p class="fw-bold text-success mb-2">Current Motion</p>
-                        <h1 class="fw-bold">N24-09 A Resolution to Protect the Second Thomas Shoal</h1>
+                        <h1 class="fw-bold">None</h1>
                     </div>
                 </div>
                 <div class="col-12 col-lg-10 mx-auto">
@@ -48,7 +48,7 @@
             <div class="row">
                 <div class="col">
                     <h1 style="text-align: center;"></h1>
-                    <h1 style="text-align: center;"><strong>Rep. Ament</strong></h1>
+                    <h1 id="current-speaker" style="text-align: center;"><strong>None</strong></h1>
                     <div></div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                             </svg></div>
                         <div class="px-2">
                             <h6 class="fw-bold mb-0"><span style="font-weight: normal !important;">Disposition</span></h6>
-                            <p style="margin: 0px;"><strong>Affirmative</strong></p>
+                            <p id="disposition" style="margin: 0px;"><strong>None</strong></p>
                             <p class="text-muted mb-0"></p>
                         </div>
                     </div>
@@ -74,7 +74,7 @@
                             </svg></div>
                         <div class="px-2">
                             <h6 class="fw-bold mb-0"><span style="font-weight: normal !important;">Time Left</span></h6>
-                            <p style="margin: 0px;"><strong>00:00</strong></p>
+                            <p id="time-remaining" style="margin: 0px;"><strong>0:00</strong></p>
                             <p class="text-muted mb-0"></p>
                         </div>
                     </div>
@@ -85,7 +85,7 @@
                                 <path d="M8.39 12.648a1.32 1.32 0 0 0-.015.18c0 .305.21.508.5.508.266 0 .492-.172.555-.477l.554-2.703h1.204c.421 0 .617-.234.617-.547 0-.312-.188-.53-.617-.53h-.985l.516-2.524h1.265c.43 0 .618-.227.618-.547 0-.313-.188-.524-.618-.524h-1.046l.476-2.304a1.06 1.06 0 0 0 .016-.164.51.51 0 0 0-.516-.516.54.54 0 0 0-.539.43l-.523 2.554H7.617l.477-2.304c.008-.04.015-.118.015-.164a.512.512 0 0 0-.523-.516.539.539 0 0 0-.531.43L6.53 5.484H5.414c-.43 0-.617.22-.617.532 0 .312.187.539.617.539h.906l-.515 2.523H4.609c-.421 0-.609.219-.609.531 0 .313.188.547.61.547h.976l-.516 2.492c-.008.04-.015.125-.015.18 0 .305.21.508.5.508.265 0 .492-.172.554-.477l.555-2.703h2.242l-.515 2.492zm-1-6.109h2.266l-.515 2.563H6.859l.532-2.563z"></path>
                             </svg></div>
                         <div class="px-2">
-                            <h6 class="fw-bold mb-0">5th Speaker</h6>
+                            <h6 class="fw-bold mb-0">Speaker 0</h6>
                             <p class="text-muted mb-0"></p>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                         <div class="card bg-primary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-primary card-text mb-2">Affirmatives Speeches</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>5<span style="font-weight: normal !important;">&nbsp;affirmative speeches on this bill. Rep. </span>Sidoti<span style="font-weight: normal !important;"> spoke last (</span>2:57<span style="font-weight: normal !important;">).</span></h5><button class="btn btn-primary btn-sm" type="button">Queue for Aff Speech</button>
+                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;affirmative speeches on this bill. Rep. </span>None<span style="font-weight: normal !important;"> spoke last (</span>0:00<span style="font-weight: normal !important;">).</span></h5><button id="aff-button" class="btn btn-primary btn-sm" type="button">Queue for Aff Speech</button>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                         <div class="card bg-secondary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-secondary card-text mb-2">Negative Speeches</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>4<span style="font-weight: normal !important;">&nbsp;negative speeches on this bill. Rep. </span>McGinty<span style="font-weight: normal !important;"> spoke last (</span>2:43<span style="font-weight: normal !important;">).</span></h5><button class="btn btn-secondary btn-sm" type="button">Queue for Neg Speech</button>
+                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;negative speeches on this bill. Rep. </span>None<span style="font-weight: normal !important;"> spoke last (</span>0:00<span style="font-weight: normal !important;">).</span></h5><button id="neg-button" class="btn btn-secondary btn-sm" type="button">Queue for Neg Speech</button>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                         <div class="card bg-info-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-info card-text mb-2">Questioning</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>32<span style="font-weight: normal !important;">&nbsp;questioning blocks. Rep. </span>Napora<span style="font-weight: normal !important;"> questioned last.</span></h5><button class="btn btn-info btn-sm" type="button">Queue for Questioning</button>
+                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;questioning blocks. Rep. </span>None<span style="font-weight: normal !important;"> questioned last.</span></h5><button id="question-button" class="btn btn-info btn-sm" type="button">Queue for Questioning</button>
                             </div>
                         </div>
                     </div>
@@ -134,28 +134,16 @@
                 <div class="col" style="background: white;padding: 12px;margin: 12px;border-radius: 16px;">
                     <h4 style="color: black;"><strong>Overall</strong></h4>
                     <ul class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
-                        <li><strong>Ament</strong></li>
-                        <li>Sidoti</li>
-                        <li><strong>Napora</strong></li>
-                        <li>McGinty</li>
                     </ul>
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
                     <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
-                        <li>Ament 0</li>
-                        <li>Sidoti 1</li>
-                        <li>Mcginty 2</li>
-                        <li>Napora 2</li>
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
                     <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
-                        <li>Ament</li>
-                        <li>Sidoti</li>
-                        <li>Mcginty</li>
-                        <li>Napora</li>
                     </ul>
                 </div>
             </div>
@@ -175,28 +163,16 @@
                 <div class="col" style="background: white;padding: 12px;margin: 12px;border-radius: 16px;">
                     <h4 style="color: black;"><strong>Overall</strong></h4>
                     <ul class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
-                        <li>Ament</li>
-                        <li><strong>Sidoti</strong></li>
-                        <li><strong>Napora</strong></li>
-                        <li>McGinty</li>
                     </ul>
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
                     <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
-                        <li>Ament 0</li>
-                        <li>Sidoti 1</li>
-                        <li>Mcginty 2</li>
-                        <li>Napora 2</li>
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
                     <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
-                        <li>Ament</li>
-                        <li>Sidoti</li>
-                        <li>Napora</li>
-                        <li>McGinty</li>
                     </ul>
                 </div>
             </div>
@@ -213,6 +189,8 @@
     <footer class="bg-dark"></footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/js/bold-and-dark.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="player.js"></script>
 </body>
 
 </html>
