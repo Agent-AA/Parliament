@@ -14,12 +14,14 @@ let speakerPrecedence = [];
  * Items with an earlier index have the higher priority; i.e., they are the least recent.
  */
 let speakerRecency = [];
+let speakerOrdering = [];
 let questionPrecedence = [];
 /**
  * @type {Array<string>}
  * Items with an earlier index have the higher priority; i.e., they are the least recent.
  */
 let questionRecency = [];
+let questionOrdering = [];
 let affQueue = [];
 let negQueue = [];
 let questionQueue = [];
@@ -171,27 +173,25 @@ $("#pause-button").click(() => {
 // when the "end speech button is clicked," perform some operations
 // and then update the server.
 $("#end-button").click(() => {
-    // Update global variables and html elements
+    // Update global variables
+    parseHTML();
     switch ($("#speaker-disposition").text()) {
         case "Affirmative" :
             affTotalSpeeches++;
-            $("#aff-count").text(affTotalSpeeches);
             affLastSpeaker = $("#speaker-name").text();
             affSpeechTime = $("#speaker-time").text();
-            $("#aff-last").text(affLastSpeaker + " (" + $("#speaker-time").text() + ")");
+            updateOrdering($("#speaker-name").text(), "speaker");
             break;
         case "Negative" :
             negTotalSpeeches++;
-            $("#neg-count").text(negTotalSpeeches);
             negLastSpeaker = $("#speaker-name").text();
             negSpeechTime = $("#speaker-time").text();
-            $("#neg-last").text(negLastSpeaker + " (" + $("#speaker-time").text() + ")");
+            updateOrdering($("#speaker-name").text(), "speaker");
             break;
         case "Question" :
             questionCount++;
-            $("#question-count").text(questionCount);
             lastQuestioner = $("#speaker-name").text();
-            $("#question-last").text(lastQuestioner);
+            updateOrdering($("#speaker-name").text(), "question");
             break;
     }
 
@@ -203,6 +203,9 @@ $("#end-button").click(() => {
     nextSpeakerNumber += negTotalSpeeches;
     $("#speaker-number").text("Speaker " + nextSpeakerNumber);
     timePaused = true;
+
+    // Update HTML
+    updateHTML();
 
     // Post an update to the server.
     postUpdate();
@@ -216,7 +219,7 @@ $("#end-button").click(() => {
 //#region ----- Main Functions -----
 /**
 * <p>In order to keep the admin dashboard intuitive and easy to use, elements are made
-* contenteditable, there is not event listener on these objects. Thus, calibration is where 
+* contenteditable, there is not event listener on these objects. Thus, parsing is where 
 * the data on the html page is parsed and stored in the javascript code, usually before being posted
 * to a server update. This also reorganizes some other things like the queues if they happen to be out of
 * order.</p>
@@ -226,15 +229,14 @@ $("#end-button").click(() => {
 * parsing, like the motion title, speaker, speaker disposition, and speaker number (which can be calculated
 * by from the number of previous speeches).</p>
 */
-function calibrate() {
-    timePaused = $("#pause-button").hasClass("selected");
-    affTotalSpeeches = $("#aff-count").text().parseInt();
+function parseHTML() {
+    affTotalSpeeches = parseInt($("#aff-count").text());
     affLastSpeaker = $("#aff-last").text().split(" ")[0];
     affSpeechTime = $("#aff-last").text().split(" ")[1].slice(1, -1);
-    negTotalSpeeches = $("#neg-count").text().parseInt();
+    negTotalSpeeches = parseInt($("#neg-count").text());
     negLastSpeaker = $("#neg-last").text().split(" ")[0];
     negSpeechTime = $("#neg-last").text().split(" ")[1].slice(1, -1);
-    questionCount = $("#question-count").text().parseInt();
+    questionCount = parseInt($("#question-count").text());
     lastQuestioner = $("#question-last").text();
 
     affQueue = parseList("#aff-queue", "", "None");
@@ -249,10 +251,58 @@ function calibrate() {
 }
 
 /**
+ * This does the functional opposite of {@link parseHTML()}. It updates html elements
+ * based on the global variables.
+ */
+function updateHTML() {
+    $("#aff-count").text(affTotalSpeeches);
+    $("#aff-last").text(affLastSpeaker + " (" + affSpeechTime + ")");
+    $("#neg-count").text(negTotalSpeeches);
+    $("#neg-last").text(negLastSpeaker + " (" + negSpeechTime + ")");
+    $("#question-count").text(questionCount);
+    $("#question-last").text(lastQuestioner);
+
+    $("#aff-queue").empty();
+    for (let i = 0; i < affQueue.length; i++) {
+        $("#aff-queue").append("<li>" + affQueue[i] + "</li>");
+    }
+
+    $("#neg-queue").empty();
+    for (let i = 0; i < negQueue.length; i++) {
+        $("#neg-queue").append("<li>" + negQueue[i] + "</li>");
+    }
+
+    $("#question-queue").empty();
+    for (let i = 0; i < questionQueue.length; i++) {
+        $("#question-queue").append("<li>" + questionQueue[i] + "</li>");
+    }
+
+    $("#speaker-precedence").empty();
+    for (let i = 0; i < speakerPrecedence.length; i++) {
+        $("#speaker-precedence").append("<li>" + speakerPrecedence[i][0] + " " + speakerPrecedence[i][1] + "</li>");
+    }
+
+    $("#speaker-recency").empty();
+    for (let i = 0; i < speakerRecency.length; i++) {
+        $("#speaker-recency").append("<li>" + speakerRecency[i] + "</li>");
+    }
+
+    $("#question-precedence").empty();
+    for (let i = 0; i < questionPrecedence.length; i++) {
+        $("#question-precedence").append("<li>" + questionPrecedence[i][0] + " " + questionPrecedence[i][1] + "</li>");
+    }
+
+    $("#question-recency").empty();
+    for (let i = 0; i < questionRecency.length; i++) {
+        $("#question-recency").append("<li>" + questionRecency[i] + "</li>");
+    }
+}
+
+/**
  * Calibrates and then posts all data to the server.
  */
 function postUpdate() {
-    calibrate();
+    parseHTML();
     const data = {
         "motion" : $("#motion-title").text(),
         "speaker" : {
@@ -323,3 +373,59 @@ function parseList(elementID, delimiter, placeholder) {
 
     return list;
 }
+
+/**
+ * Updates the overall ordering of speakers by adjusting precedence and recency.
+ * 
+ * @param {string} item the item to update ordering for.
+ * @param {string} type the type of item to update. Should be either "speaker" or "question".
+ */
+function updateOrdering(item, type) {
+   if (type == "speaker") {
+        updateRecency(speakerRecency, item);
+        updatePrecedence(speakerPrecedence, item);
+    } else {
+        updateRecency(questionRecency, item);
+        updatePrecedence(questionPrecedence, item);
+    }
+}
+
+/**
+ * Updates a recency list by returning the
+ * passed item to the end of the list.
+ * 
+ * @param {Array<string>} array the recency array to update. Should be either {@link speakerRecency} or {@link questionRecency}.
+ * @param {string} item the item to update.
+ */
+function updateRecency(array, item) {
+    let index = array.indexOf(item);
+    if (index != -1) {
+        array.splice(index, 1);
+    }
+    array.push(item);
+}
+
+/**
+ * Updates a precedence list by incrementing the
+ * second element of the passed item in the array
+ * @param {Array<string>} array the precedence array to update. Should be either {@link speakerPrecedence} or {@link questionPrecedence}.
+ * @param {string} item the item to update.
+ */
+function updatePrecedence(array, item) {
+    console.log(array);
+    console.log(item);
+
+    // find the array whose first element is the item, and increment
+    for (let i = 0; i < array.length; i++) {
+        if (array[i][0] == item) {
+            array[i][1]++;;
+            break;
+        }
+    }
+
+    // Sort the array by the second element
+    array.sort((a, b) => {
+        return a[1] - b[1];
+    });
+}
+//#endregion
