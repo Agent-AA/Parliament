@@ -216,6 +216,45 @@ $("#neg-button").click(() => {
     updateHTML();
     postUpdate();
 });
+
+// SHORTCUTS
+// shortcut to update to server is ctrl + enter
+$(document).keydown((event) => {
+    if (event.ctrlKey && event.key == "Enter") {
+        parseHTML();
+        updateHTML();
+        postUpdate();
+    }
+});
+
+// shortcut to pause time is ctrl + space
+$(document).keydown((event) => {
+    if (event.ctrlKey && event.key == " ") {
+        timePaused = !timePaused;
+        parseHTML();
+        updateHTML();
+        postUpdate();
+    }
+});
+
+// shortcut to conclude speaker is ctrl + c
+$(document).keydown((event) => {
+    if (event.ctrlKey && event.key == "c") {
+
+        concludeSpeaker();
+    }
+});
+
+// shortcut to recognize next questioner is ctrl + q
+$(document).keydown((event) => {
+    if (event.ctrlKey && event.key == "q") {
+        if ($("#speaker-disposition").text() != "None") {
+            concludeSpeaker();
+        }
+    }
+});
+
+
 //#endregion
 
 
