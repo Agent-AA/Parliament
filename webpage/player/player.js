@@ -133,6 +133,12 @@ function update() {
         $("#question-count").text(data.question.totalQuestions);
         $("#question-last").text(data.question.lastQuestioner);
 
+        try {
+            data.questionOrder.queue.length;
+        } catch (err) {
+            questionOrder = ["None"];
+        }
+
         $("#question-queue").empty();
         for (let i = 0; i < data.questionOrder.queue.length; i++) {
             if (data.questionOrder.queue[i] != "None") {
