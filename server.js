@@ -83,6 +83,7 @@ app.get('/data', (req, res) => {
     "speakingOrder" : {
       "precedence" : speakerPrecedence,
       "recency" : speakerRecency,
+      "order" : speakerOrder,
       "queue" : {
         "aff" : affQueue,
         "neg" : negQueue
@@ -91,6 +92,7 @@ app.get('/data', (req, res) => {
     "questionOrder" : {
       "precedence" : questionPrecedence,
       "recency" : questionRecency,
+      "order" : questionOrder,
       "queue" : questionQueue
     }
   }
@@ -100,7 +102,6 @@ app.get('/data', (req, res) => {
 // The admin page posts updates here
 app.post('/update', (req, res) => {
   console.log(req.body);
-  
   motion = req.body.motion;
   speaker = req.body.speaker.name;
   disposition = req.body.speaker.disposition;
@@ -115,16 +116,6 @@ app.post('/update', (req, res) => {
   lastNegTime = req.body.neg.speechTime;
   questionCount = req.body.question.totalQuestions;
   lastQuestioner = req.body.question.lastQuestioner;
-
-  // deal with timer. Booleans turn into strings when JSONified, so that's how we have to do it here.
-  console.log(timePaused)
-  if (timePaused == 'false') {
-    timer = setInterval(() => {
-      time++
-    }, 1000);
-  } else if (timePaused == 'true') {
-    clearInterval(timer);
-  }
   
   // For some reason expressJS doesn't like empty arrays and won't render JSON fields with empty arrays, so we have to use try catch statements like this for arrays.
   try {
@@ -140,9 +131,9 @@ app.post('/update', (req, res) => {
   }
 
   try {
-    speakerOrdering = req.body.speakingOrder.ordering;
+    speakerOrder = req.body.speakingOrder.ordering;
   } catch (err) {
-    speakerOrdering = ['None'];
+    speakerOrder = ['None'];
   }
 
   try {
@@ -170,9 +161,9 @@ app.post('/update', (req, res) => {
   }
 
   try {
-    questionOrdering = req.body.questionOrder.ordering;
+    questionOrder = req.body.questionOrder.ordering;
   } catch (err) {
-    questionOrdering = ['None'];
+    questionOrder = ['None'];
   }
 
   try {
@@ -185,6 +176,96 @@ app.post('/update', (req, res) => {
 
   res.sendStatus(201)
 });
+
+app.post("/queue", (req, res) => {
+  console.log(req.body);
+
+  // Because of the server's errors with empty arrays,
+  // we have to error check all the queues
+
+  try {
+    affQueue.includes(" ");
+  } catch (err) {
+    affQueue = ['None'];
+  }
+
+  try {
+    negQueue.includes(" ");
+  } catch (err) {
+    negQueue = ['None'];
+  }
+  
+  try {
+    questionQueue.includes(" ");
+  } catch (err) {
+    questionQueue = ['None'];
+  }
+
+  
+  switch (req.body.type) {
+    case "aff":
+      if (!affQueue.includes(req.body.name)) {
+        affQueue.push(req.body.name);
+      } break;
+    case "neg":
+      if (!negQueue.includes(req.body.name)) {
+        negQueue.push(req.body.name);
+      } break;
+    case "question":
+      if (!questionQueue.includes(req.body.name)) {
+        questionQueue.push(req.body.name);
+      }
+  }
+  res.sendStatus(201);
+});
+
+app.post("/unqueue", (req, res) => {
+  console.log(req.body);
+
+  // Because of the server's problems with empty array,
+  // we have to error check all the queues
+  try {
+    affQueue.includes(" ");
+  } catch (err) {
+    affQueue = ['None'];
+  }
+
+  try {
+    negQueue.includes(" ");
+  } catch (err) {
+    negQueue = ['None'];
+  }
+
+  try {
+    questionQueue.includes(" ");
+  } catch (err) {
+    questionQueue = ['None'];
+  }
+
+  
+  switch (req.body.type) {
+    case "aff":
+      if (affQueue.includes(req.body.name)) {
+        affQueue.splice(affQueue.indexOf(req.body.name), 1);
+      } break;
+    case "neg":
+      if (negQueue.includes(req.body.name)) {
+        negQueue.splice(negQueue.indexOf(req.body.name), 1);
+      } break;
+    case "question":
+      if (questionQueue.includes(req.body.name)) {
+        questionQueue.splice(questionQueue.indexOf(req.body.name), 1);
+      }
+  }
+
+  res.sendStatus(201);
+});
+
+setInterval(() => {
+  if (timePaused == "false") {
+    time++;
+  }
+}, 1000);
 
 
 app.listen(port, () => {

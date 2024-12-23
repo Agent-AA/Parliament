@@ -20,13 +20,14 @@ $("#name-input").on("input", () => {
 
 //#region ----- QUEUE BUTTONS -----
 const buttons = [
-    ["#aff-button", "Aff Speech"],
-    ["#neg-button", "Neg Speech"],
-    ["#question-button", "Questioning"],
+    ["#aff-button", "aff"],
+    ["#neg-button", "neg"],
+    ["#question-button", "question"],
 ];
 
 buttons.forEach((element) => {
     $(element[0]).click(() => {
+        console.log(element[1]);
         // If button is not already selected
         if (!$(element[0]).hasClass("selected")) {
             // Add 'selected class
