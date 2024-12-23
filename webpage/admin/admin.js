@@ -387,50 +387,17 @@ function updateHTML() {
     $("#question-count").text(questionCount);
     $("#question-last").text(lastQuestioner);
 
-    $("#aff-queue").empty();
-    for (let i = 0; i < affQueue.length; i++) {
-        $("#aff-queue").append("<li>" + affQueue[i] + "</li>");
-    }
+    putRecency("#aff-queue", affQueue);
+    putRecency("#neg-queue", negQueue);
+    putRecency("#question-queue", questionQueue);
 
-    $("#neg-queue").empty();
-    for (let i = 0; i < negQueue.length; i++) {
-        $("#neg-queue").append("<li>" + negQueue[i] + "</li>");
-    }
+    putRecency("#speaker-ordering", speakerOrdering);
+    putPrecedence("#speaker-precedence", speakerPrecedence);
+    putRecency("#speaker-recency", speakerRecency);
 
-    $("#question-queue").empty();
-    for (let i = 0; i < questionQueue.length; i++) {
-        $("#question-queue").append("<li>" + questionQueue[i] + "</li>");
-    }
-
-    $("#speaker-ordering").empty();
-    for (let i = 0; i < speakerOrdering.length; i++) {
-        $("#speaker-ordering").append("<li>" + speakerOrdering[i] + "</li>");
-    }
-
-    $("#speaker-precedence").empty();
-    for (let i = 0; i < speakerPrecedence.length; i++) {
-        $("#speaker-precedence").append("<li>" + speakerPrecedence[i][0] + " " + speakerPrecedence[i][1] + "</li>");
-    }
-
-    $("#speaker-recency").empty();
-    for (let i = 0; i < speakerRecency.length; i++) {
-        $("#speaker-recency").append("<li>" + speakerRecency[i] + "</li>");
-    }
-
-    $("#question-ordering").empty();
-    for (let i = 0; i < questionOrdering.length; i++) {
-        $("#question-ordering").append("<li>" + questionOrdering[i] + "</li>");
-    }
-
-    $("#question-precedence").empty();
-    for (let i = 0; i < questionPrecedence.length; i++) {
-        $("#question-precedence").append("<li>" + questionPrecedence[i][0] + " " + questionPrecedence[i][1] + "</li>");
-    }
-
-    $("#question-recency").empty();
-    for (let i = 0; i < questionRecency.length; i++) {
-        $("#question-recency").append("<li>" + questionRecency[i] + "</li>");
-    }
+    putRecency("#question-ordering", questionOrdering);
+    putPrecedence("#question-precedence", questionPrecedence);
+    putRecency("#question-recency", questionRecency);
 
 
 }
@@ -603,6 +570,25 @@ function parseRecency(elementID) {
 }
 
 /**
+ * Accepts an element ID and recency list and updates the HTML accordingly. This
+ * function is also used to update the overall ordering.
+ * 
+ * @param {string} elementID the id attribute of the list element 
+ * @param {Array<string>} list the array / list of items to put in the list element
+ */
+function putRecency(elementID, list) {
+    if (list.length != 0) {
+        $(elementID).empty();
+    for (let i = 0; i < list.length; i++) {
+        $(elementID).append("<li>" + list[i] + "</li>");
+        }
+    } else {
+        $(elementID).empty();
+        $(elementID).append("<li>None</li>");
+    }
+}
+
+/**
  * Parses an unstyled list element representing a precedence order and returns an array of the listed items.
  * 
  * @param {string} elementID the id attribute of the list element
@@ -617,6 +603,24 @@ function parsePrecedence(elementID) {
     });
 
     return list;
+}
+
+/**
+ * Accepts an element ID and precedence list and updates the HTML accordingly.
+ * 
+ * @param {string} elementID the id attribute of the list element 
+ * @param {Array<string>} list the array / list of items to put in the list element
+ */
+function putPrecedence(elementID, list) {
+    if (list.length != 0) {
+        $(elementID).empty();
+        for (let i = 0; i < list.length; i++) {
+            $(elementID).append("<li>" + list[i][0] + " " + list[i][1] + "</li>");
+        }
+    } else {
+        $(elementID).empty();
+        $(elementID).append("<li>None 0</li>");
+    }
 }
 
 /**
