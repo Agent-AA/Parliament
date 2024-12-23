@@ -198,6 +198,11 @@ $("#neg-button").click(() => {
 });
 
 $("#question-button").click(() => {
+
+    if (disposition != "None") {
+        concludeSpeaker();
+    }
+    
     speaker = questionQueue.shift();
     disposition = "Question";
     time = 0;
@@ -269,7 +274,7 @@ $(document).keydown((e) => {
 */
 function update() {
 
-    number = affTotalSpeeches + negTotalSpeeches + 1;
+    number = parseInt(affTotalSpeeches) + parseInt(negTotalSpeeches) + 1;
 
     // If any of the ordering lists are blank, autofill them based off of speaker recency.
     if (speakerPrecedence.length == 0) {
@@ -320,17 +325,35 @@ function update() {
     });
     questionOrdering = questionOrdering.map((a) => a[0]);
 
-    affQueue.sort((a, b) => {
-        return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
-    });
+    try {
+        if (affQueue.length > 1) {
+            affQueue.sort((a, b) => {
+                return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+            });
+        }
+    } catch (err) {
+        affQueue = [];
+    }
 
-    negQueue.sort((a, b) => {
-        return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
-    });
+    try {
+        if (negQueue.length > 1) {
+            negQueue.sort((a, b) => {
+                return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+            });
+        }
+    } catch (err) {
+        negQueue = [];
+    }
 
-    questionQueue.sort((a, b) => {
-        return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
-    });
+    try {
+        if (questionQueue.length > 1) {
+            questionQueue.sort((a, b) => {
+                return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
+            });
+        }
+    } catch (err) {
+        questionQueue = [];
+    }
 
     // Finally, update the webpage and server.
     updateHTML();
@@ -471,22 +494,36 @@ setInterval(() => {
         }
         
         // Update the queues
-        affQueue = data.speakingOrder.queue.aff;
-        negQueue = data.speakingOrder.queue.neg;
-        questionQueue = data.questionOrder.queue;
+        try {
+            affQueue = data.speakingOrder.queue.aff;
+            affQueue = affQueue.filter((a) => a != "None");
+            affQueue.sort((a, b) => {
+                return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+            });
+        } catch (err) {
+            affQueue = [];
+        }
 
-        // Sort queues if there's more than two queuers
-        affQueue.sort((a, b) => {
-            return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
-        });
-    
-        negQueue.sort((a, b) => {
-            return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
-        });
-    
-        questionQueue.sort((a, b) => {
-            return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
-        });
+        try {
+            negQueue = data.speakingOrder.queue.neg;
+            negQueue = negQueue.filter((a) => a != "None");
+            negQueue.sort((a, b) => {
+                return speakerOrdering.indexOf(a) - speakerOrdering.indexOf(b);
+            });
+        } catch (err) {
+            negQueue = [];
+        }
+
+        try {
+            questionQueue = data.questionOrder.queue;
+            questionQueue = questionQueue.filter((a) => a != "None");
+            questionQueue.sort((a, b) => {
+                return questionOrdering.indexOf(a) - questionOrdering.indexOf(b);
+            });
+
+        } catch (err) {
+            questionQueue = [];    
+        }
 
         // We don't want to call the update() function, because that would meaning constantly
         // overwriting the user's input. Instead, we just want to update the queues.

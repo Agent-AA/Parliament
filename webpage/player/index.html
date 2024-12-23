@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Home - Brand</title>
+    <title>ParliPro</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
@@ -12,7 +12,7 @@
 
 <body>
     <nav class="navbar navbar-expand-md sticky-top py-3 navbar-dark" id="mainNav" style="color: white;">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"><i class="fa fa-gavel"></i></span><span>Parliament</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><span class="bs-icon-sm bs-icon-circle bs-icon-primary shadow d-flex justify-content-center align-items-center me-2 bs-icon"><i class="fa fa-gavel"></i></span><span>ParliPro</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link active" href="/player.html">Motion</a></li>
@@ -30,7 +30,7 @@
                 <div class="col-md-8 col-xl-6 text-center text-md-start mx-auto" style="padding: 0px 12px 12px 12px;">
                     <div class="text-center">
                         <p class="fw-bold text-success mb-2">Current Motion</p>
-                        <h1 class="fw-bold">None</h1>
+                        <h1 id="motion-title" class="fw-bold">None</h1>
                     </div>
                 </div>
                 <div class="col-12 col-lg-10 mx-auto">
@@ -61,7 +61,7 @@
                             </svg></div>
                         <div class="px-2">
                             <h6 class="fw-bold mb-0"><span style="font-weight: normal !important;">Disposition</span></h6>
-                            <p id="disposition" style="margin: 0px;"><strong>None</strong></p>
+                            <p id="disposition" class="fw-bold" style="margin: 0px;">None</p>
                             <p class="text-muted mb-0"></p>
                         </div>
                     </div>
@@ -73,8 +73,8 @@
                                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"></path>
                             </svg></div>
                         <div class="px-2">
-                            <h6 class="fw-bold mb-0"><span style="font-weight: normal !important;">Time Left</span></h6>
-                            <p id="time-remaining" style="margin: 0px;"><strong>0:00</strong></p>
+                            <h6 class="fw-bold mb-0"><span style="font-weight: normal !important;">Time</span></h6>
+                            <p id="time-remaining" class="fw-bold" style="margin: 0px;">0:00</p>
                             <p class="text-muted mb-0"></p>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                         <div class="card bg-primary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-primary card-text mb-2">Affirmatives Speeches</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;affirmative speeches on this bill. Rep. </span>None<span style="font-weight: normal !important;"> spoke last (</span>0:00<span style="font-weight: normal !important;">).</span></h5><button id="aff-button" class="btn btn-primary btn-sm" type="button">Queue for Aff Speech</button>
+                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been <span id="aff-count" class="fw-bold">0</span> affirmative speeches. Rep. <span id="aff-last" class="fw-bold">None</span> spoke last (<span id="aff-time" class="fw-bold">0:00</span>).</h5><button id="aff-button" class="btn btn-primary btn-sm" type="button">Queue for Aff Speech</button>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                         <div class="card bg-secondary-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-secondary card-text mb-2">Negative Speeches</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;negative speeches on this bill. Rep. </span>None<span style="font-weight: normal !important;"> spoke last (</span>0:00<span style="font-weight: normal !important;">).</span></h5><button id="neg-button" class="btn btn-secondary btn-sm" type="button">Queue for Neg Speech</button>
+                                 <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been <span id="neg-count" class="fw-bold">0</span> negative speeches. Rep. <span id="neg-last" class="fw-bold">None</span> spoke last (<span id="neg-time" class="fw-bold">0:00</span>).</h5><button id="neg-button" class="btn btn-secondary btn-sm" type="button">Queue for Neg Speech</button>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@
                         <div class="card bg-info-light">
                             <div class="card-body text-center px-4 py-5 px-md-5">
                                 <p class="fw-bold text-info card-text mb-2">Questioning</p>
-                                <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been </span>0<span style="font-weight: normal !important;">&nbsp;questioning blocks. Rep. </span>None<span style="font-weight: normal !important;"> questioned last.</span></h5><button id="question-button" class="btn btn-info btn-sm" type="button">Queue for Questioning</button>
+                                 <h5 class="fw-bold card-title mb-3"><span style="font-weight: normal !important;">There have been <span id="question-count" class="fw-bold">0</span> questioning blocks. Rep. <span id="question-last" class="fw-bold">None</span> questioned last.</h5><button id="question-button" class="btn btn-info btn-sm" type="button">Queue for Question</button>
                             </div>
                         </div>
                     </div>
@@ -133,17 +133,17 @@
             <div class="row">
                 <div class="col" style="background: white;padding: 12px;margin: 12px;border-radius: 16px;">
                     <h4 style="color: black;"><strong>Overall</strong></h4>
-                    <ul class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
+                    <ul id="speaking-overall" class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
+                    <ul id="speaking-precedence" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
+                    <ul id="speaking-recency" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
             </div>
@@ -162,23 +162,23 @@
             <div class="row">
                 <div class="col" style="background: white;padding: 12px;margin: 12px;border-radius: 16px;">
                     <h4 style="color: black;"><strong>Overall</strong></h4>
-                    <ul class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
+                    <ul id="question-overall" class="list-unstyled" style="color: black;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
                 <div class="col" style="margin: 12px;padding: 12px;background: var(--bs-primary);border-radius: 16px;">
                     <h4><strong>Precedence</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
+                    <ul id="question-precedence" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
                 <div class="col" style="background: rgb(39,38,46);margin: 12px;padding: 12px;border-radius: 16px;">
                     <h4><strong>Recency</strong></h4>
-                    <ul class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
+                    <ul id="question-recency" class="list-unstyled" style="color: white;font-size: 24px;text-align: center;">
                     </ul>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <p style="text-align: center;">Representatives are listed in order from highest priority at the top to lower priority at the bottom. Representatives tied in precedence are listed in no particular order. Bolded representatives have queued to speak or question.</p>
+                    <p style="text-align: center;">Representatives are listed in order from highest priority at the top to lower priority at the bottom.</p>
                 </div>
             </div>
         </div>
