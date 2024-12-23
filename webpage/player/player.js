@@ -100,16 +100,21 @@ function update() {
         $("#current-speaker").text(data.speaker.name);
         $("#disposition").text(data.speaker.disposition);
         $("#time-remaining").text(timeToString(data.speaker.time));
-
+        if (data.speaker.disposition != "Question") {
+            $("#speaker-number").text("Speaker " + data.speaker.number);
+        } else {
+            $("#speaker-number").empty();
+        }
         // aff card
         $("#aff-count").text(data.aff.totalSpeeches);
         $("#aff-last").text(data.aff.lastSpeaker);
         $("#aff-time").text(timeToString(data.aff.speechTime));
 
-        // Update aff button based on whether we are queued or not
-        if (data.aff.lastSpeaker == $("#name-input").val()) {
-            $("#aff-button").text("Unqueue");
-            $("#aff-button").removeClass("selected");
+        $("#aff-queue").empty();
+        for (let i = 0; i < data.speakingOrder.queue.aff.length; i++) {
+            if (data.speakingOrder.queue.aff[i] != "None") {
+                $("#aff-queue").append("<li>" + data.speakingOrder.queue.aff[i] + "</li>");
+            }
         }
 
         // neg card
@@ -117,20 +122,22 @@ function update() {
         $("#neg-last").text(data.neg.lastSpeaker);
         $("#neg-time").text(timeToString(timeToString(data.neg.speechTime)));
 
-        // Update aff button based on whether we are queued or not
-        if (data.neg.lastSpeaker == $("#name-input").val()) {
-            $("#neg-button").text("Unqueue");
-            $("#neg-button").removeClass("selected");
+        $("#neg-queue").empty();
+        for (let i = 0; i < data.speakingOrder.queue.neg.length; i++) {
+            if (data.speakingOrder.queue.neg[i] != "None") {
+                $("#neg-queue").append("<li>" + data.speakingOrder.queue.neg[i] + "</li>");
+            }
         }
 
         // question card
         $("#question-count").text(data.question.totalQuestions);
         $("#question-last").text(data.question.lastQuestioner);
 
-        // Update aff button based on whether we are queued or not
-        if (data.question.lastQuestioner == $("#name-input").val()) {
-            $("#question-button").text("Unqueue");
-            $("#question-button").removeClass("selected");
+        $("#question-queue").empty();
+        for (let i = 0; i < data.questionOrder.queue.length; i++) {
+            if (data.questionOrder.queue[i] != "None") {
+                $("#question-queue").append("<li>" + data.questionOrder.queue[i] + "</li>");
+            }
         }
 
         // Speaking order, precedence, and recency
