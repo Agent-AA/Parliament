@@ -17,6 +17,10 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, '/webpage/admin/index.html'));
 });
+
+app.head('/', (req, res) => {
+  res.sendStatus(200);
+});
 //#endregion
 
 //#region ----- SESSION VARIABLES AND FUNCTIONS -----

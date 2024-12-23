@@ -1,20 +1,16 @@
 //#region ----- NAME INPUT -----
-// On page load, check if the user has a name stored in cookies
+// On page load, check if the user has a name stored in local storage. Cookies wasn't working for some reason, and could be blocked, so local storage suffices.
 $(document).ready(() => {
-    // Get name from cookies
-    const name = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("name="));
-    if (name) {
-        // Set name in input
-        $("#name-input").val(name.split("=")[1]);
+    let storedName = localStorage.getItem("name");
+    if (storedName) {
+        $("#name-input").val(storedName);
     }
 });
 
-// When the user types in their name at the top, store the name in cookies
+// When the user types in their name at the top, store the name in local storage
 $("#name-input").on("input", () => {
-    // Store name in cookies
-    document.cookie = `name=${$("#name-input").val()}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    // Store name in local storage
+    localStorage.setItem("name", $("#name-input").val());
 });
 //#endregion
 
@@ -98,18 +94,103 @@ buttons.forEach((element) => {
 // Function to constantly update the dashboard
 function update() {
     $.get("/data", (data) => {
-        // Update various elements
+        console.log(data);
+    // Update all the elements on the page
+        $("#motion-title").text(data.motion)
         $("#current-speaker").text(data.speaker.name);
         $("#disposition").text(data.speaker.disposition);
-        $("#time-remaining").text(data.speaker.timeRemaining);
+        $("#time-remaining").text(timeToString(data.speaker.time));
 
-        if (data.disposition !== "questioning") {
-            $("#current-number").text("Speaker " + data.speaker.number);
-        } else {
-            $("#current-number").text("Questioner " + data.speaker.number);
+        // aff card
+        $("#aff-count").text(data.aff.totalSpeeches);
+        $("#aff-last").text(data.aff.lastSpeaker);
+        $("#aff-time").text(timeToString(data.aff.speechTime));
+
+        // Update aff button based on whether we are queued or not
+        if (data.aff.lastSpeaker == $("#name-input").val()) {
+            $("#aff-button").text("Unqueue");
+            $("#aff-button").removeClass("selected");
+        }
+
+        // neg card
+        $("#neg-count").text(data.neg.totalSpeeches);
+        $("#neg-last").text(data.neg.lastSpeaker);
+        $("#neg-time").text(timeToString(timeToString(data.neg.speechTime)));
+
+        // Update aff button based on whether we are queued or not
+        if (data.neg.lastSpeaker == $("#name-input").val()) {
+            $("#neg-button").text("Unqueue");
+            $("#neg-button").removeClass("selected");
+        }
+
+        // question card
+        $("#question-count").text(data.question.totalQuestions);
+        $("#question-last").text(data.question.lastQuestioner);
+
+        // Update aff button based on whether we are queued or not
+        if (data.question.lastQuestioner == $("#name-input").val()) {
+            $("#question-button").text("Unqueue");
+            $("#question-button").removeClass("selected");
+        }
+
+        // Speaking order, precedence, and recency
+        $("#speaking-overall").empty();
+        for (let i = 0; i < data.speakingOrder.order.length; i++) {
+            $("#speaking-overall").append("<li>" + data.speakingOrder.order[i] + "</li>");
+        }
+
+        $("#speaking-precedence").empty();
+        for (let i = 0; i < data.speakingOrder.precedence.length; i++) {
+            $("#speaking-precedence").append("<li>" + data.speakingOrder.precedence[i][0] + " " + data.speakingOrder.precedence[i][1] + "</li>");
+        }
+
+        $("#speaking-recency").empty();
+        for (let i = 0; i < data.speakingOrder.recency.length; i++) {
+            $("#speaking-recency").append("<li>" + data.speakingOrder.recency[i] + "</li>");
+        }
+
+        // Question order, precedence, and recency
+        $("#question-overall").empty();
+        for (let i = 0; i < data.questionOrder.order.length; i++) {
+            $("#question-overall").append("<li>" + data.questionOrder.order[i] + "</li>");
+        }
+
+        $("#question-precedence").empty();
+        for (let i = 0; i < data.questionOrder.precedence.length; i++) {
+            $("#question-precedence").append("<li>" + data.questionOrder.precedence[i][0] + " " + data.questionOrder.precedence[i][1] + "</li>");
+        }
+
+        $("#question-recency").empty();
+        for (let i = 0; i < data.questionOrder.recency.length; i++) {
+            $("#question-recency").append("<li>" + data.questionOrder.recency[i] + "</li>");
         }
     });
 }
 
 // Run the update function every 1,000 milliseconds
 setInterval(update, 500);
+
+
+
+
+
+
+/**
+ * Converts a number of seconds to a string in the format "m:ss".
+ * The inverse function of this one is {@link timeToSeconds()}.
+ * 
+ * @param {number} time the time in seconds to convert.
+ * 
+ * @returns a string in the format "m:ss"
+ */
+function timeToString (time) {
+    time = parseInt(time);
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
+    return minutes + ":" + seconds;
+}
