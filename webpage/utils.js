@@ -146,29 +146,37 @@ function putPrecedence(elementID, list) {
 }
 
 function computeSpeakingOrder() {
-    let order = session.speaking.precedence.sort((a, b) => a[1] - b[1]).map((a) => a[0]);
-
+    let order = session.speaking.precedence.sort((a, b) => a[1] - b[1]);
+    
     // Now sort speaking order by index in speaking recency
     order.sort((a, b) => {
-        let aIndex = session.speaking.recency.indexOf(a);
-        let bIndex = session.speaking.recency.indexOf(b);
-        return aIndex - bIndex;
+        if (a[1] == b[1]) {
+            let aIndex = session.speaking.recency.indexOf(a[0]);
+            let bIndex = session.speaking.recency.indexOf(b[0]);
+            return aIndex - bIndex;
+        } else {
+            return 1;
+        }
     });
 
-    return order;
+    return order.map(a => a[0]);
 }
 
 function computeQuestioningOrder() {
-    let order = session.questioning.precedence.sort((a, b) => a[1] - b[1]).map((a) => a[0]);
+    let order = session.questioning.precedence.sort((a, b) => a[1] - b[1]);
 
     // Now sort speaking order by index in speaking recency
     order.sort((a, b) => {
-        let aIndex = session.questioning.recency.indexOf(a);
-        let bIndex = session.questioning.recency.indexOf(b);
-        return aIndex - bIndex;
+        if (a[1] == b[1]) {
+            let aIndex = session.questioning.recency.indexOf(a[0]);
+            let bIndex = session.questioning.recency.indexOf(b[0]);
+            return aIndex - bIndex;
+        } else {
+            return 1;
+        }
     });
 
-    return order;
+    return order.map(a => a[0]);
 }
 
 /**

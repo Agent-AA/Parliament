@@ -10,7 +10,6 @@ getSession((data) => {
 });
 
 
-
 //#region Editing Events
 // Motion title
 $("#current-motion-text").focusout(() => {
@@ -45,6 +44,7 @@ $("#speaking-precedence").focusout(() => {
 
     // compute new speaking order
     session.speaking.order = computeSpeakingOrder();
+    putPrecedence("#speaking-precedence", session.speaking.precedence);
     putRecency("#speaking-order", session.speaking.order);
     
     updateServer();
@@ -73,20 +73,33 @@ $("#speaking-recency").focusout(() => {
         putPrecedence("#questioning-precedence", session.questioning.precedence);
         putRecency("#questioning-recency", session.questioning.recency);
 
+    } else {
+        session.speaking.order = computeSpeakingOrder();
+        putRecency("#speaking-order", session.speaking.order);
     }
     
     updateServer();
 });
 
 // Question precedence
-$("#questining-precedence").focusout(() => {
-    session.questioning.precedence = parsePrecedence("#question-precedence");
-    updateServer();
-});
+$("#questioning-precedence").focusout(() => {
+    session.questioning.precedence = parsePrecedence("#questioning-precedence");
+
+        // compute new speaking order
+        session.questioning.order = computeQuestioningOrder();
+        putPrecedence("#questioning-precedence", session.questioning.precedence);
+        putRecency("#questioning-order", session.questioning.order);
+
+        updateServer();
+    });
 
 // Question recency
 $("#questioning-recency").focusout(() => {
-    session.questioning.recency = parseRecency("#question-recency");
+    session.questioning.recency = parseRecency("#questioning-recency");
+
+    session.questioning.order = computeQuestioningOrder();
+    putRecency("#questioning-order", session.questioning.order);
+    
     updateServer();
 });
 //#endregion
