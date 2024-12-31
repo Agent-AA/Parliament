@@ -30,14 +30,66 @@ app.get('/newSession', (req, res) => {
   sessionID = Math.floor(Math.random() * 10000);
   // fill in zeros so 5 digits long
   sessionID = sessionID.toString().padStart(5, '0');
-  
+
+  // initialize the session
   session = {
     "id": sessionID,
-    "created_at": Date.now(),
+    "createdAt": Date.now(),
+    "currentMotion": "None",
+    "currentSpeaker": {
+      "name": "None",
+      "disposition": "None",
+      "time": 0,
+      "timePaused": false,
+      "number": 1,
+    },
+    "speaking": {
+      "queue": {
+        "aff": ["None"],
+        "neg": ["None"],
+      },
+      "order": ["None"],
+      "precedence": [["None", 0]],
+      "recency": ["None"],
+    },
+    "questioning": {
+      "queue": ["None"],
+      "order": ["None"],
+      "precedence": [["None", 0]],
+      "recency": ["None"],
+    },
+    "last": {
+      "aff": {
+        "speaker": "None",
+        "time": 0,
+      },
+      "neg": {
+        "speaker": "None",
+        "time": 0
+      },
+      "questioner": "None"
+    },
+    "total": {
+      "aff": 0,
+      "neg": 0,
+      "questions": 0
+    }
   }
   
   utils.save(session);
   res.send(session);
+});
+
+app.get('/session/:sessionID', (req, res) => {
+  session = utils.read(req.params.sessionID);
+  res.send(session);
+});
+
+app.post('/update/:sessionID', (req, res) => {
+  session = req.body;
+  console.log(session);
+  utils.save(session);
+  res.sendStatus(201);
 });
 
 //#endregion

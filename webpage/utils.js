@@ -5,16 +5,20 @@
  *
  * @returns {string} The session ID.
  */
-function getSessionID() {
+function getSession(callback) {
+    
     let id = getCookie("sessionID");
     if (id != "") {
-        return id;
+        $.get("/session/" + id, (data) => {
+             callback(data);
+        });
     } else {
         $.get("/newSession", (data) => {
-            id = data.session_id;
+            id = data.id
             setCookie("sessionID", id, 1);
+            console.log(data);
+            callback(data);
         });
-        return id;
     }
 }
 
@@ -139,6 +143,32 @@ function putPrecedence(elementID, list) {
         $(elementID).empty();
         $(elementID).append("<li>None 0</li>");
     }
+}
+
+function computeSpeakingOrder() {
+    let order = session.speaking.precedence.sort((a, b) => a[1] - b[1]).map((a) => a[0]);
+
+    // Now sort speaking order by index in speaking recency
+    order.sort((a, b) => {
+        let aIndex = session.speaking.recency.indexOf(a);
+        let bIndex = session.speaking.recency.indexOf(b);
+        return aIndex - bIndex;
+    });
+
+    return order;
+}
+
+function computeQuestioningOrder() {
+    let order = session.questioning.precedence.sort((a, b) => a[1] - b[1]).map((a) => a[0]);
+
+    // Now sort speaking order by index in speaking recency
+    order.sort((a, b) => {
+        let aIndex = session.questioning.recency.indexOf(a);
+        let bIndex = session.questioning.recency.indexOf(b);
+        return aIndex - bIndex;
+    });
+
+    return order;
 }
 
 /**

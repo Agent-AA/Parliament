@@ -7,7 +7,7 @@
 const save = session => {
   const fs = require('fs');
   const jsonData = JSON.stringify(session);
-  fs.writeFileSync( "/sessions/" + session.id + '.json', jsonData);
+  fs.writeFileSync( "sessions/" + session.id + '.json', jsonData);
 }
 
 /**
@@ -18,10 +18,12 @@ const save = session => {
 const read = sessionID => {
   try {
     const fs = require('fs');
-    const jsonData = fs.readFileSync("/sessions/" + sessionID + '.json');
+    const jsonData = fs.readFileSync("sessions/" + sessionID + '.json');
     return JSON.parse(jsonData);
   } catch (err) {
-    return "No session found";
+    return {
+      "error": "No session found"
+    };
   }
 }
 
