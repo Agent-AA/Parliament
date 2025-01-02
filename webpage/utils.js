@@ -159,8 +159,12 @@ function parseRecency(elementID) {
 function putRecency(elementID, list) {
     $(elementID).empty();
 
-    l = list.filter((a) => a != "None");
-
+    let l = [];
+    
+    try {
+        l = list.filter((a) => a != "None");
+    } catch (err) {}
+    
     if (l.length != 0) {
         l.forEach((element) => {
             $(elementID).append("<li>" + element + "</li>");

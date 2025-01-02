@@ -22,7 +22,7 @@ const read = sessionID => {
     return JSON.parse(jsonData);
   } catch (err) {
     return {
-      "error": "No session found"
+      "error": "No sesion found"
     };
   }
 }

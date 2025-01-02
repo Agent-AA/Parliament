@@ -18,6 +18,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/webpage/login.html"));
 });
 
+app.get("/member", (req, res) => {
+  res.sendFile(path.join(__dirname, "/webpage/member.html"));
+});
+
 app.get("/president", (req, res) => {
   res.sendFile(path.join(__dirname, "/webpage/president.html"));
 });
@@ -77,15 +81,11 @@ app.get("/newSession", (req, res) => {
 });
 
 app.get("/session/:sessionID", (req, res) => {
-  try {
-    session = utils.read(req.params.sessionID);
-    res.send(session);
-  } catch (err) {
-    res.sendStatus(404);
-  }
+  session = utils.read(req.params.sessionID);
+  res.send(session);
 });
 
-app.post("/update/:sessionID", (req, res) => {
+app.post("/update/:sessionID", (req3, res) => {
   session = req.body;
   console.log(session);
   utils.save(session);

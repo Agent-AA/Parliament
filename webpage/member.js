@@ -1,19 +1,3 @@
-//#region ----- NAME INPUT -----
-// On page load, check if the user has a name stored in local storage. Cookies wasn't working for some reason, and could be blocked, so local storage suffices.
-$(document).ready(() => {
-    let storedName = localStorage.getItem("name");
-    if (storedName) {
-        $("#name-input").val(storedName);
-    }
-});
-
-// When the user types in their name at the top, store the name in local storage
-$("#name-input").on("input", () => {
-    // Store name in local storage
-    localStorage.setItem("name", $("#name-input").val());
-});
-//#endregion
-
 //#region ----- QUEUE BUTTONS -----
 const buttons = [
     ["#aff-button", "aff"],
@@ -32,8 +16,8 @@ buttons.forEach((element) => {
             $(element[0]).text("Unqueue");
 
             // Send POST request to server
-            $.post("/queue", {
-                name: $("#name-input").val(),
+            $.post("/queue/" + getCookie("sessionID"), {
+                name: getCookie("name"),
                 type: element[1],
             });
         } else {
@@ -43,8 +27,8 @@ buttons.forEach((element) => {
             $(element[0]).text("Queue for " + element[1]);
 
             // Send POST request to server
-            $.post("/unqueue", {
-                name: $("#name-input").val(),
+            $.post("/unqueue/" + getCookie("sessionID"), {
+                name: getCookie("name"),
                 type: element[1],
             });
         }
@@ -176,28 +160,3 @@ function update() {
 
 // Run the update function every 1,000 milliseconds
 setInterval(update, 500);
-
-
-
-
-
-
-/**
- * Converts a number of seconds to a string in the format "m:ss".
- * The inverse function of this one is {@link timeToSeconds()}.
- * 
- * @param {number} time the time in seconds to convert.
- * 
- * @returns a string in the format "m:ss"
- */
-function timeToString (time) {
-    time = parseInt(time);
-    let minutes = Math.floor(time / 60);
-    let seconds = time % 60;
-
-    if (seconds < 10) {
-        seconds = "0" + seconds;
-    }
-
-    return minutes + ":" + seconds;
-}

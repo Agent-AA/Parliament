@@ -12,9 +12,17 @@ if (getCookie("sessionID") != "") {
 function handleSubmit(event) {
   event.preventDefault();
   const id = $("#id-input").val();
+  const name = $("#name-input").val();
 
   $.get("/session/" + id, (data) => {
-      console.log(data);
+      if (data.error == "No session found" || !data.speaking.order.includes(name)) {
+        $("#incorrect-warning").removeAttr("hidden");
+      } else {
+        setCookie("sessionID", id, 1);
+        setCookie("name", name, 1);
+        setCookie("status", "member", 1);
+        window.location.href = "/member";
+      }
   });
   
 }
