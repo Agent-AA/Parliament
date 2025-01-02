@@ -81,9 +81,8 @@ $("#questioning-precedence").focusout(() => {
     session.questioning.precedence = parsePrecedence("#questioning-precedence");
 
         // compute new speaking order
-        session.questioning.order = computeQuestioningOrder();
+        computeQuestioningOrder();
         putPrecedence("#questioning-precedence", session.questioning.precedence);
-        putRecency("#questioning-order", session.questioning.order);
 
         updateServer();
     });
@@ -92,8 +91,7 @@ $("#questioning-precedence").focusout(() => {
 $("#questioning-recency").focusout(() => {
     session.questioning.recency = parseRecency("#questioning-recency");
 
-    session.questioning.order = computeQuestioningOrder();
-    putRecency("#questioning-order", session.questioning.order);
+    computeQuestioningOrder();
     
     updateServer();
 });
@@ -150,6 +148,9 @@ $("#question-button").click(() => {
     session.currentSpeaker.disposition = "Question";
     session.currentSpeaker.time = 0;
     session.currentSpeaker.timePaused = false;
+
+    updateDashboard();
+    updateServer();
 });
 
 //#endregion
@@ -197,12 +198,12 @@ function updateDashboard() {
     putRecency("#aff-queue", session.questioning.queue);
 
     // Speaking lists
-    putRecency("#speaking-order", session.speaking.order);
+    computeSpeakingOrder();
     putPrecedence("#speaking-precedence", session.speaking.precedence);
     putRecency("#speaking-recency", session.speaking.recency);
 
     // Questioning lists
-    putRecency("#questioning-order", session.questioning.order);
+    computeQuestioningOrder();
     putPrecedence("#questioning-precedence", session.questioning.precedence);
     putRecency("#questioning-recency", session.questioning.recency);
 }

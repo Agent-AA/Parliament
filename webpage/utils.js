@@ -33,11 +33,8 @@ function concludeSpeaker() {
     }
 
     // Compute new overall orders
-    session.speaking.order = computeSpeakingOrder();
-    session.questioning.order = computeQuestioningOrder();
-
-    putRecency("#speaking-order", session.speaking.order);
-    putRecency("#question-order", session.questioning.order);
+    computeSpeakingOrder();
+    computeQuestioningOrder();
 
     // Clear speaker card
     session.currentSpeaker.name = "None";
@@ -258,14 +255,11 @@ function computeSpeakingOrder() {
 }
 
 /**
- * Computes the correct questioning order based off of `session.questioning.precedence` and `session.questioning.recency`.
- * and returns that order.
+ * Computes the questioning order in place and displays it to the dashboard.
  *
- * @returns {array<string>} the computed questioning order
  */
 function computeQuestioningOrder() {
     let order = session.questioning.precedence.sort((a, b) => a[1] - b[1]);
-
     // Now sort speaking order by index in speaking recency
     order.sort((a, b) => {
         if (a[1] == b[1]) {
@@ -277,7 +271,8 @@ function computeQuestioningOrder() {
         }
     });
 
-    return order.map(a => a[0]);
+    session.questioning.order = order.map(a => a[0]);
+    putRecency("#questioning-order", session.questioning.order);
 }
 
 /**
