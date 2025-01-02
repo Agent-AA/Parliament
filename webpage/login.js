@@ -15,7 +15,7 @@ function handleSubmit(event) {
   const name = $("#name-input").val();
 
   $.get("/session/" + id, (data) => {
-      if (data.error == "No session found" || !data.speaking.order.includes(name)) {
+      if (name != "" && (data.error == "No session found" || !data.speaking.order.includes(name))) {
         $("#incorrect-warning").removeAttr("hidden");
       } else {
         setCookie("sessionID", id, 1);
