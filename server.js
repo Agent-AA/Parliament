@@ -5,6 +5,8 @@ const app = express();
 const utils = require("./serverUtils");
 const port = 8000;
 
+let timeList = [];
+
 app.use(express.urlencoded({ extended: true }));
 
 //#region ----- Webpage and static file requests -----
@@ -88,6 +90,13 @@ app.get("/session/:sessionID", (req, res) => {
 app.post("/update/:sessionID", (req, res) => {
   session = req.body;
   console.log(session);
+
+  if (session.currentSpeaker.timePaused == "false") {
+    utils.clock.add(session.id);
+  } else if (session.currentSpeaker.timePaused == "true") {
+    utils.clock.remove(session.id);
+  }
+  
   utils.save(session);
   res.sendStatus(201);
 });
@@ -114,3 +123,5 @@ app.post("/unqueue/:sessionID", (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
+
+setInterval(utils.clock.tick, 1000);

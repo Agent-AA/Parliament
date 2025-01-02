@@ -241,7 +241,8 @@ function updateQueueAndTime() {
         session.questioning.queue = serverSession.questioning.queue.filter(a => a != "None");
 
         // update the dashboard
-        $("time-text").text(session.currentSpeaker.time);
+        $("#time-text").text(timeToString(session.currentSpeaker.time));
+        $("#time-header").text(timeToString(session.currentSpeaker.time));
         putRecency("#aff-queue", session.speaking.queue.aff);
         putRecency("#neg-queue", session.speaking.queue.neg);
         putRecency("#question-queue", session.questioning.queue);

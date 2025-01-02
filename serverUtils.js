@@ -1,4 +1,26 @@
 /**
+ * An object used to track speaking time.
+ */
+const clock = {
+    list: [],
+    add: sessionID => {
+        if (!clock.list.includes(sessionID)) {
+            clock.list.push(sessionID);
+        }
+    },
+    remove: sessionID => {
+        clock.list = clock.list.filter(a => a != sessionID);
+    },
+    tick: () => {
+        for (let i = 0; i < clock.list.length; i++) {
+            session = module.exports.read(clock.list[i]);
+            session.currentSpeaker.time++;
+            module.exports.save(session);
+        }
+    }
+}
+
+/**
  * Writes the specified session object to a file named
  * with the session's id, specifically in the format "{session-id}.json"
  *
@@ -137,9 +159,10 @@ const removeFromQueue = (type, item) => {
 }
 
 module.exports = {
+    clock,
     save,
     read,
     addToQueue,
     sortQueue,
-    removeFromQueue
+    removeFromQueue,
 }
