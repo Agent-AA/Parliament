@@ -120,15 +120,42 @@ $("#end-button").click(() => {
     updateServer();
 });
 
+// when the "recognize Next Aff" button is pressed, add the top affirmation queue to the speaker card.
 $("#aff-button").click(() => {
-
+    session.currentSpeaker.name = session.speaking.queue.aff.shift();
+    session.currentSpeaker.disposition = "Affirmative";
+    session.currentSpeaker.time = 0;
+    session.currentSpeaker.timePaused = true;
+    updateDashboard();
+    updateServer();
 });
 
+// when the "Recognize Next Neg" button is pressed, add the top negative queue to the speaker card.
 $("#neg-button").click(() => {
-
+    session.currentSpeaker.name = session.speaking.queue.neg.shift();
+    session.currentSpeaker.disposition = "Negative";
+    session.currentSpeaker.time = 0;
+    session.currentSpeaker.timePaused = true;
+    updateDashboard();
+    updateServer();
 });
 
+/*
+ * The questioning button is a little more complicated than the aff and neg buttons.
+ * Because questioning happens quickly, the question button does two more things than the
+ * aff or neg buttons. The questioning button:
+ * (1) will conclude the speaker/questioner rather than just override them.
+ * (2) will immediately start the time for questioning.
+ */
 $("#question-button").click(() => {
+    if (session.currentSpeaker.disposition != "None") {
+        concludeSpeaker();
+    }
+
+    session.currentSpeaker.name = session.questioning.queue.shift();
+    session.currentSpeaker.disposition = "Question";
+    session.currentSpeaker.time = 0;
+    session.currentSpeaker.timePaused = false;
 });
 
 //#endregion
