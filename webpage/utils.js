@@ -183,6 +183,8 @@ function putRecency(elementID, list) {
  * Parses an unstyled list element representing a precedence order and returns an array of the listed items.
  * Only actual members are included in the list. "None" and empty elements ("" or "\n") are discarded.
  * 
+ * If there are no elements to parse, the function will return [["None", 0]].
+ * 
  * @param {string} elementID the id attribute of the list element
  * 
  * @returns {Array<string>} the list of items in the list element, formatted as [{string} item, {number} precedence];
@@ -196,7 +198,11 @@ function parsePrecedence(elementID) {
         }
     });
 
-    return list;
+    if (list.length > 0) {
+        return list;
+    } else {
+        return [["None", 0]];
+    }
 }
 
 /**
@@ -226,10 +232,11 @@ function putPrecedence(elementID, list) {
 }
 
 /**
- * Computes the correct speaking order based off of `session.speaking.precedence` and `session.speaking.recency`.
- * and returns that order.
+ * Computes the correct speaking order based off of `session.speaking.precedence` and `session.speaking.recency` and modifies
+ * `session.speaking.order` in place.
+ * 
+ * Updates the dasboard with the new speaking order.
  *
- * @returns {array<string>} the computed speaking order
  */
 function computeSpeakingOrder() {
     let order = session.speaking.precedence.sort((a, b) => a[1] - b[1]);
@@ -245,7 +252,9 @@ function computeSpeakingOrder() {
         }
     });
 
-    return order.map(a => a[0]);
+    session.speaking.order = order.map(a => a[0]);
+    putRecency("#speaking-order", session.speaking.order);
+
 }
 
 /**

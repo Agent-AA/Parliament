@@ -43,9 +43,8 @@ $("#speaking-precedence").focusout(() => {
     session.speaking.precedence = parsePrecedence("#speaking-precedence");
 
     // compute new speaking order
-    session.speaking.order = computeSpeakingOrder();
+    computeSpeakingOrder();
     putPrecedence("#speaking-precedence", session.speaking.precedence);
-    putRecency("#speaking-order", session.speaking.order);
     
     updateServer();
 });
@@ -226,3 +225,4 @@ function updateQueueAndTime() {
 }
 
 setInterval(updateQueueAndTime, 500);
+//#endregion
