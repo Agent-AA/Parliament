@@ -56,9 +56,7 @@ $("#speaking-recency").focusout(() => {
     if (session.speaking.recency.length > 0 && session.speaking.precedence.length == 1) {
             
         session.speaking.precedence = session.speaking.recency.map((a) => [a, 0]);
-        session.speaking.order = computeSpeakingOrder();
 
-        putRecency("#speaking-order", session.speaking.order);
         putPrecedence("#speaking-precedence", session.speaking.precedence);
 
         // questioning recency should be the reversed array of speaking recency
@@ -72,11 +70,9 @@ $("#speaking-recency").focusout(() => {
         putPrecedence("#questioning-precedence", session.questioning.precedence);
         putRecency("#questioning-recency", session.questioning.recency);
 
-    } else {
-        session.speaking.order = computeSpeakingOrder();
-        putRecency("#speaking-order", session.speaking.order);
     }
     
+    computeSpeakingOrder();
     updateServer();
 });
 
@@ -212,15 +208,43 @@ function updateDashboard() {
 }
 
 function updateServer() {
+
+    /* 
+    * because JSON doesn't like empty arrays when transmitted
+    * we have to do this stupid thing and put something in
+    * empty arrays. Otherwise, the server will see the
+    * property as undefined
+    */
+    if (session.speaking.queue.aff.length == 0) {
+        session.speaking.queue.aff.push("None");
+    }
+
+    if (session.speaking.queue.neg.length == 0) {
+        session.speaking.queue.neg.push("None");
+    }
+
+    if (session.questioning.queue.length == 0) {
+        session.questioning.queue.push("None");
+    }
+    
     $.post("/update/" + session.id, session);
 }
 
 function updateQueueAndTime() {
     $.get("/session/" + session.id, (serverSession) => {
-        $("#time-text").text(timeToString(serverSession.currentSpeaker.time));
-        putRecency("#aff-queue", serverSession.speaking.queue.aff);
-        putRecency("#neg-queue", serverSession.speaking.queue.neg);
-        putRecency("#question-queue", serverSession.questioning.queue);
+
+        // update select values
+        session.currentSpeaker.time = serverSession.currentSpeaker.time;
+        session.speaking.queue.aff = serverSession.speaking.queue.aff.filter(a => a != "None");
+        session.speaking.queue.neg = serverSession.speaking.queue.neg.filter(a => a != "None");
+        session.questioning.queue = serverSession.questioning.queue.filter(a => a != "None");
+
+        // update the dashboard
+        $("time-text").text(session.currentSpeaker.time);
+        putRecency("#aff-queue", session.speaking.queue.aff);
+        putRecency("#neg-queue", session.speaking.queue.neg);
+        putRecency("#question-queue", session.questioning.queue);
+
     })
 }
 

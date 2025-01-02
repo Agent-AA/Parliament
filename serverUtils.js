@@ -27,32 +27,71 @@ const read = sessionID => {
   }
 }
 
-const sortQueue = (queue, type) => {
-  
-  if (type == "aff" || type == "neg") {
-
-    // sort by speaking precedence
-    queue = session.speaking.precedence.filter(a => queue.includes(a[0]));
+/**
+ * Adds an item to an array in place, in the appropriate position, if that item is not already in the array.
+ *
+ * @param {string} type - Either "aff", "neg", or "question"
+ * @param {string} item - The item to add to the queue
+ */
+const addToQueue = (type, item) => {
     
-      // Now sort speaking order by index in speaking recency
-      queue.sort((a, b) => {
-          if (a[1] == b[1]) {
-              let aIndex = session.speaking.recency.indexOf(a[0]);
-              let bIndex = session.speaking.recency.indexOf(b[0]);
-              return aIndex - bIndex;
-          } else {
-              return 1;
-          }
-      });
+    // if speech
+    if (type == "aff" || type == "neg") {
+        
+        // if item is not already in queue
+        if (!session.speaking.queue[type].includes(item)) {
+            // add to queue
+            session.speaking.queue[type].push(item);
+            // sort queue
+            sortQueue(type);
+        }
+    // else if question
+    } else if (type == "question") {
 
-      return queue.map(a => a[0]);
-  } else {
+        // if item is not already in queue
+        if (!session.questioning.queue.includes(item)) {
+            // add to queue
+            session.questioning.queue.push(item);
+            // sort queue
+            sortQueue("question");
+        }
+    }
+}
+
+/**
+ * Sorts an array by the correct precedence and recency.
+ *
+ * @param {string} type - Either "aff", "neg", or "question"
+ */
+const sortQueue = (type) => {
+
+    // if speech
+    if (type == "aff" || type == "neg") {
+        
+        // sort by precedence
+        session.speaking.queue[type] = session.speaking.precedence.filter(a => session.speaking.queue[type].includes(a[0]));
     
-      // sort by questioning precedence
-      queue = session.questioning.precedence.filter(a => queue.includes(a[0]));
+        // now sort by recency
+        session.speaking.queue[type].sort((a, b) => {
+            if (a[1] == b[1]) {
+                let aIndex = session.speaking.recency.indexOf(a[0]);
+                let bIndex = session.speaking.recency.indexOf(b[0]);
+                return aIndex - bIndex;
+            } else {
+                return 1;
+            }
+        });
 
-        // Now sort speaking order by index in speaking recency
-        queue.sort((a, b) => {
+        // remove precedence number
+        session.speaking.queue[type] = session.speaking.queue[type].map(a => a[0]);
+        
+  } else if (type == "question") {
+    
+      // sort by precedence
+      session.questioning.queue = session.questioning.precedence.filter(a => session.questioning.queue.includes(a[0]));
+
+        // Now sort by recency
+        session.questioning.queue.sort((a, b) => {
             if (a[1] == b[1]) {
                 let aIndex = session.questioning.recency.indexOf(a[0]);
                 let bIndex = session.questioning.recency.indexOf(b[0]);
@@ -62,12 +101,45 @@ const sortQueue = (queue, type) => {
             }
         });
 
-        return queue.map(a => a[0]);
+        // remove precedence number
+        session.questioning.queue = session.questioning.queue.map(a => a[0]);
   }
 }
 
+/**
+ * Removes `item` from the queue indicated by `type`, if it is in the queue. Does nothing otherwise.
+ *
+ * @param {string} type - Either "aff", "neg", or "question"
+ * @param {string} item - The item to remove from the queue
+ */
+const removeFromQueue = (type, item) => {
+
+    // if speech
+    if (type == "aff" || type == "neg") {
+        // remove item from queue
+        session.speaking.queue[type] = session.speaking.queue[type].filter((a) => a != item);
+
+        // if queue is now empty, it won't transmit over JSON, so we add a placeholder "None" value.
+        if (session.speaking.queue[type].length == 0) {
+            session.speaking.queue[type] = ["None"];
+        }
+    }
+    // if question
+    else if (type == "question") {
+        // remove item from queue
+        session.questioning.queue = session.questioning.queue.filter((a) => a != item);
+
+        // if queue is now empty, it won't transmit over JSON, so we add a placeholder "None" value.
+        if (session.questioning.queue.length == 0) {
+            session.questioning.queue = ["None"];
+        }
+    }
+}
+
 module.exports = {
-  save,
-  read,
-  sortQueue
+    save,
+    read,
+    addToQueue,
+    sortQueue,
+    removeFromQueue
 }

@@ -10,36 +10,21 @@ app.use(express.urlencoded({ extended: true }));
 //#region ----- Webpage and static file requests -----
 app.use(express.static(path.join(__dirname, "/webpage")));
 
-
-
-
 app.head("/", (req, res) => {
   res.sendStatus(200);
 });
-
-
-
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/webpage/login.html"));
 });
 
-
-
-
 app.get("/member", (req, res) => {
   res.sendFile(path.join(__dirname, "/webpage/member.html"));
 });
 
-
-
-
 app.get("/president", (req, res) => {
   res.sendFile(path.join(__dirname, "/webpage/president.html"));
 });
-
-
-
 
 app.get("/newSession", (req, res) => {
   sessionID = Math.floor(Math.random() * 10000);
@@ -95,17 +80,10 @@ app.get("/newSession", (req, res) => {
   res.send(session);
 });
 
-
-
-
 app.get("/session/:sessionID", (req, res) => {
   session = utils.read(req.params.sessionID);
-  console.log(session);
   res.send(session);
 });
-
-
-
 
 app.post("/update/:sessionID", (req, res) => {
   session = req.body;
@@ -114,59 +92,18 @@ app.post("/update/:sessionID", (req, res) => {
   res.sendStatus(201);
 });
 
-
-
-
 app.post("/queue/:sessionID", (req, res) => {
+  
   session = utils.read(req.params.sessionID);
-  switch (req.body.type) {
-    case "aff":
-      try {session.speaking.queue.aff.includes(req.body.name)} catch (err) {session.speaking.queue.aff = ["None"]}
-      if (!session.speaking.queue.aff.includes(req.body.name)) {
-        session.speaking.queue.aff.push(req.body.name);
-      } 
-      utils.sortQueue(session.speaking.queue.aff, "aff");
-      break;
-    case "neg":
-      try {session.speaking.queue.neg.includes(req.body.name)} catch (err) {session.speaking.queue.neg = ["None"]}
-      if (!session.speaking.queue.neg.includes(req.body.name)) {
-        session.speaking.queue.neg.push(req.body.name);
-      } 
-      utils.sortQueue(session.speaking.queue.neg, "neg");
-      break;
-    case "question":
-      try {session.questioning.queue.includes(req.body.name)} catch (err) {session.questioning.queue = ["None"]}
-      if (!session.questioning.queue.includes(req.body.name)) {
-        session.questioning.queue.push(req.body.name)
-      } 
-      utils.sortQueue(session.questioning.queue, "question");
-      break;
-  }
+  utils.addToQueue(req.body.type, req.body.name);
 
   utils.save(session);
   res.sendStatus(201);
 });
 
-
-
-
 app.post("/unqueue/:sessionID", (req, res) => {
   session = utils.read(req.params.sessionID);
-  console.log(req.body.name);
-  switch (req.body.type) {
-    case "aff":
-      try {session.speaking.queue.aff.includes(req.body.name)} catch (err) {session.speaking.queue.aff = ["None"]}
-      session.speaking.queue.aff = session.speaking.queue.aff.filter((item) => item != req.body.name);
-      break;
-    case "neg":
-      try {session.speaking.queue.neg.includes(req.body.name)} catch (err) {session.speaking.queue.neg = ["None"]}
-      session.speaking.queue.neg = session.speaking.queue.neg.filter((item) => item != req.body.name);
-      break;
-    case "question":
-      try {session.questioning.queue.includes(req.body.name)} catch (err) {session.questioning.queue = ["None"]}
-      session.questioning.queue = session.questioning.queue.filter((item) => item != req.body.name);
-      break;
-  }
+  utils.removeFromQueue(req.body.type, req.body.name);
 
   utils.save(session);
   res.sendStatus(201);
