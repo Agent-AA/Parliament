@@ -27,7 +27,47 @@ const read = sessionID => {
   }
 }
 
+const sortQueue = (queue, type) => {
+  
+  if (type == "aff" || type == "neg") {
+
+    // sort by speaking precedence
+    queue = session.speaking.precedence.filter(a => queue.includes(a[0]));
+    
+      // Now sort speaking order by index in speaking recency
+      queue.sort((a, b) => {
+          if (a[1] == b[1]) {
+              let aIndex = session.speaking.recency.indexOf(a[0]);
+              let bIndex = session.speaking.recency.indexOf(b[0]);
+              return aIndex - bIndex;
+          } else {
+              return 1;
+          }
+      });
+
+      return queue.map(a => a[0]);
+  } else {
+    
+      // sort by questioning precedence
+      queue = session.questioning.precedence.filter(a => queue.includes(a[0]));
+
+        // Now sort speaking order by index in speaking recency
+        queue.sort((a, b) => {
+            if (a[1] == b[1]) {
+                let aIndex = session.questioning.recency.indexOf(a[0]);
+                let bIndex = session.questioning.recency.indexOf(b[0]);
+                return aIndex - bIndex;
+            } else {
+                return 1;
+            }
+        });
+
+        return queue.map(a => a[0]);
+  }
+}
+
 module.exports = {
   save,
-  read
+  read,
+  sortQueue
 }

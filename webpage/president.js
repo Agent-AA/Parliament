@@ -1,11 +1,10 @@
-//#region ----- Global Variables -----
-/**
- * 
- */
+// This file contains all of the event triggers and such specfically for president.html.
+// More generic functions are stored in utils.js.
+
 let session;
 
-getSession((data) => {
-    session = data;
+getSession((serverSession) => {
+    session = serverSession;
     session.currentSpeaker.timePaused = parseBool(session.currentSpeaker.timePaused);
     updateDashboard();
 });
@@ -216,3 +215,14 @@ function updateDashboard() {
 function updateServer() {
     $.post("/update/" + session.id, session);
 }
+
+function updateQueueAndTime() {
+    $.get("/session/" + session.id, (serverSession) => {
+        $("#time-text").text(timeToString(serverSession.currentSpeaker.time));
+        putRecency("#aff-queue", serverSession.speaking.queue.aff);
+        putRecency("#neg-queue", serverSession.speaking.queue.neg);
+        putRecency("#question-queue", serverSession.questioning.queue);
+    })
+}
+
+setInterval(updateQueueAndTime, 500);

@@ -73,9 +73,9 @@ function update() {
 
         $("#neg-queue").empty();
         try {
-            for (let i = 0; i < data.speakingOrder.queue.neg.length; i++) {
-                if (data.speakingOrder.queue.neg[i] != "None") {
-                    $("#neg-queue").append("<li>" + data.speakingOrder.queue.neg[i] + "</li>");
+            for (let i = 0; i < session.speaking.queue.neg.length; i++) {
+                if (session.speaking.queue.neg[i] != "None") {
+                    $("#neg-queue").append("<li>" + session.speaking.queue.neg[i] + "</li>");
                 }
             }
         } catch (err) {}
@@ -85,11 +85,10 @@ function update() {
         $("#question-last").text(session.last.questioner);
 
         $("#question-queue").empty();
-        
         try {
-            for (let i = 0; i < data.questionOrder.queue.length; i++) {
-                if (data.questionOrder.queue[i] != "None") {
-                    $("#question-queue").append("<li>" + data.questionOrder.queue[i] + "</li>");
+            for (let i = 0; i < session.questioning.queue.length; i++) {
+                if (session.questioning.queue[i] != "None") {
+                    $("#question-queue").append("<li>" + session.questioning.queue[i] + "</li>");
                 }
             }
         } catch (err) {}
