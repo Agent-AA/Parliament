@@ -6,6 +6,7 @@ let session;
 
 getSession((data) => {
     session = data;
+    session.currentSpeaker.timePaused = parseBool(session.currentSpeaker.timePaused);
     updateDashboard();
 });
 
@@ -62,7 +63,7 @@ $("#speaking-recency").focusout(() => {
         putRecency("#speaking-order", session.speaking.order);
         putPrecedence("#speaking-precedence", session.speaking.precedence);
 
-            // questioning recency should be the reversed array of speaking recency
+        // questioning recency should be the reversed array of speaking recency
         session.questioning.recency = session.speaking.recency.slice().reverse();
 
         session.questioning.precedence = session.speaking.recency.map((a) => [a, 0]);
@@ -106,13 +107,17 @@ $("#questioning-recency").focusout(() => {
 
 
 //#region Button Events
+
 // when the "start / stop time button" is clicked, pause or unpause the timer and update server
 $("#time-button").click(() => {
-
+    session.currentSpeaker.timePaused = !session.currentSpeaker.timePaused;
+    updateServer();
 });
 
+// when the end button is pressed, end the current speaker and update server
 $("#end-button").click(() => {
-
+    concludeSpeaker();
+    updateServer();
 });
 
 $("#aff-button").click(() => {

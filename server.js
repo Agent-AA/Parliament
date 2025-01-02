@@ -40,7 +40,7 @@ app.get('/newSession', (req, res) => {
       "name": "None",
       "disposition": "None",
       "time": 0,
-      "timePaused": false,
+      "timePaused": true,
       "number": 1,
     },
     "speaking": {

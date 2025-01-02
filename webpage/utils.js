@@ -1,4 +1,55 @@
 /**
+ * Clears the speaker card and updates the speaking or questioning order.
+ *
+ * Won't update the speaking card if it is incorrectly configured. It determines this by whether the disposition is set to "None" or not.
+ */
+function concludeSpeaker() {
+
+    // Pause time
+    session.currentSpeaker.timePaused = true;
+    
+    // Update correct orders
+    switch (session.currentSpeaker.disposition) {
+        case "Affirmative": 
+            session.last.aff.speaker = session.currentSpeaker.name;
+            session.last.aff.time = session.currentSpeaker.time;
+            session.total.aff++;
+            session.currentSpeaker.number++;
+            updateSpeakingOrder(session.currentSpeaker.name);
+            break;
+        
+        case "Negative": 
+            session.last.neg.speaker = session.currentSpeaker.name;
+            session.last.neg.time = session.currentSpeaker.time;
+            session.total.neg++;
+            session.currentSpeaker.number++;
+            updateSpeakingOrder(session.currentSpeaker.name);
+            break;
+            
+        case "Question":
+            session.last.questioner = session.currentSpeaker.name;
+            session.total.questions++;
+            updateQuestionOrder(session.currentSpeaker.name);
+    }
+
+    // Compute new overall orders
+    session.speaking.order = computeSpeakingOrder();
+    session.questioning.order = computeQuestioningOrder();
+
+    putRecency("#speaking-order", session.speaking.order);
+    putRecency("#question-order", session.questioning.order);
+
+    // Clear speaker card
+    session.currentSpeaker.name = "None";
+    session.currentSpeaker.disposition = "None";
+    session.currentSpeaker.time = 0;
+
+    updateDashboard();
+    updateServer();
+}
+
+
+/**
  * Retrieves the session ID from cookies. If the session ID does not exist,
  * it makes a request to the server to generate a new session ID, sets the cookie,
  * and returns the new session ID.
@@ -54,6 +105,26 @@ function getCookie(name) {
         }
     }
     return "";
+}
+
+/**
+ * Parses a boolean from a string.
+ *
+ * When transmitted as json data across the internet, booleans are converted into
+ * strings, and java has no built-in boolean parsing function.
+ *
+ * @param {string} boolStr - The string to parse.
+ *
+ * @returns {boolean} true, false, or NaN.
+ */
+function parseBool(boolStr) {
+    if (boolStr == "true") {
+        return true;
+    } else if (boolStr == "false") {
+        return false;
+    } else {
+        return NaN;
+    }
 }
 
 /**
@@ -145,6 +216,12 @@ function putPrecedence(elementID, list) {
     }
 }
 
+/**
+ * Computes the correct speaking order based off of `session.speaking.precedence` and `session.speaking.recency`.
+ * and returns that order.
+ *
+ * @returns {array<string>} the computed speaking order
+ */
 function computeSpeakingOrder() {
     let order = session.speaking.precedence.sort((a, b) => a[1] - b[1]);
     
@@ -162,6 +239,12 @@ function computeSpeakingOrder() {
     return order.map(a => a[0]);
 }
 
+/**
+ * Computes the correct questioning order based off of `session.questioning.precedence` and `session.questioning.recency`.
+ * and returns that order.
+ *
+ * @returns {array<string>} the computed questioning order
+ */
 function computeQuestioningOrder() {
     let order = session.questioning.precedence.sort((a, b) => a[1] - b[1]);
 
@@ -180,29 +263,29 @@ function computeQuestioningOrder() {
 }
 
 /**
- * Increments the number of times spoken for the specified speaker and moves them to the last index
- * of the speaking recency list.
+ * Increments the number of times spoken for the specified speaker on `session.speaking.precedence` and
+ * moves them to the end of the `session.speaking.recency` array.
  * 
  * @param {string} speaker the name of the speaker
  */
 function updateSpeakingOrder(speaker) {
-    let precedenceIndex = speakerPrecedence.findIndex((a) => a[0] == speaker);
-    speakerPrecedence[precedenceIndex][1]++;
-    speakerRecency.splice(speakerRecency.indexOf(speaker), 1);
-    speakerRecency.push(speaker);
+    let precedenceIndex = session.speaking.precedence.findIndex((a) => a[0] == speaker);
+    session.speaking.precedence[precedenceIndex][1]++;
+    session.speaking.recency.splice(session.speaking.recency.indexOf(speaker), 1);
+    session.speaking.recency.push(speaker);
 }
 
 /**
- * Increments the number of questions asked for the specified questioner and moves them to the last
- * index of the questioning recency list.
+ * Increments the number of times spoken for the specified speaker on `session.questioning.precedence` and
+ * moves them to the end of the `session.questioning.recency` array.
  * 
  * @param {string} questioner the name of the questioner
  */
 function updateQuestionOrder(questioner) {
-    let precedenceIndex = questionPrecedence.findIndex((a) => a[0] == questioner);
-    questionPrecedence[precedenceIndex][1]++;
-    questionRecency.splice(questionRecency.indexOf(questioner), 1);
-    questionRecency.push(questioner);
+    let precedenceIndex = session.questioning.precedence.findIndex((a) => a[0] == questioner);
+    session.questioning.precedence[precedenceIndex][1]++;
+    session.questioning.recency.splice(session.questioning.recency.indexOf(questioner), 1);
+    session.questioning.recency.push(questioner);
 }
 
 /**
