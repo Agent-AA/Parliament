@@ -142,7 +142,12 @@ function parseRecency(elementID) {
             list.push(element.innerText);
         }
         });
-    return list;
+    
+    if (list.length == 0) {
+        return ["None"];
+    } else {
+        return list;
+    }
 }
 
 /**

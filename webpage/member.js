@@ -37,123 +37,93 @@ buttons.forEach((element) => {
 //#endregion
 
 //#region ----- LIVE POLLING -----
-/**
- * Function to update the dasboard. Data is in the following JSON format:
- * {
- *  speaker: {
- *      name: string,
- *      disposition: string,
- *      timeRemaining: string,
- *      number: number,
- *  },
- *  aff: {
- *     totalSpeeches: number,
- *     lastSpeaker: string,
- *     speechTime: number
- *  },
- *  neg: {
- *    totalSpeeches: number,
- *    lastSpeaker: string,
- *    speechTime: number,
- *  },
- *  question: {
- *      totalBlocks: number,
- *      lastQuestioner: string
- *  }
- *  speakingOrder: {
- *     precedent: string[],
- *     recency: string[],
- *     queue: {
- *        aff: string[],
- *       neg: string[],
- *     }
- *  },
- *  questionOrder: {
- *    precedent: string[],
- *   recency: string[],
- *  queue: string[]
- *  }
- * }
- */
+
 // Function to constantly update the dashboard
 function update() {
-    $.get("/data", (data) => {
-        console.log(data);
+    $.get("/session/" + getCookie("sessionID"), (session) => {
+        console.log(session);
     // Update all the elements on the page
-        $("#motion-title").text(data.motion)
-        $("#current-speaker").text(data.speaker.name);
-        $("#disposition").text(data.speaker.disposition);
-        $("#time-remaining").text(timeToString(data.speaker.time));
-        if (data.speaker.disposition != "Question") {
-            $("#speaker-number").text("Speaker " + data.speaker.number);
+        $("#current-motion-text").text(session.currentMotion)
+        $("#speaker-name").text(session.currentSpeaker.name);
+        $("#disposition-text").text(session.currentSpeaker.disposition);
+        $("#time-text").text(timeToString(session.currentSpeaker.time));
+        if (session.currentSpeaker.disposition != "Question") {
+            $("#number-text").text("Speaker " + session.currentSpeaker.number);
         } else {
-            $("#speaker-number").empty();
+            $("#number-text").empty();
         }
         // aff card
-        $("#aff-count").text(data.aff.totalSpeeches);
-        $("#aff-last").text(data.aff.lastSpeaker);
-        $("#aff-time").text(timeToString(data.aff.speechTime));
+        $("#aff-count").text(session.total.aff);
+        $("#aff-last").text(session.last.aff.speaker);
+        $("#aff-time").text(timeToString(session.last.aff.time));
 
         $("#aff-queue").empty();
-        for (let i = 0; i < data.speakingOrder.queue.aff.length; i++) {
-            if (data.speakingOrder.queue.aff[i] != "None") {
-                $("#aff-queue").append("<li>" + data.speakingOrder.queue.aff[i] + "</li>");
+        try {
+            for (let i = 0; i < session.speaking.queue.aff.length; i++) {
+                if (session.speaking.queue.aff[i] != "None") {
+                    $("#aff-queue").append("<li>" + session.speaking.queue.aff[i] + "</li>");
+                }
             }
-        }
+        } catch (err) {}
 
         // neg card
-        $("#neg-count").text(data.neg.totalSpeeches);
-        $("#neg-last").text(data.neg.lastSpeaker);
-        $("#neg-time").text(timeToString(timeToString(data.neg.speechTime)));
+        $("#neg-count").text(session.total.neg);
+        $("#neg-last").text(session.last.neg.speaker);
+        $("#neg-time").text(timeToString(session.last.neg.time));
 
         $("#neg-queue").empty();
-        for (let i = 0; i < data.speakingOrder.queue.neg.length; i++) {
-            if (data.speakingOrder.queue.neg[i] != "None") {
-                $("#neg-queue").append("<li>" + data.speakingOrder.queue.neg[i] + "</li>");
+        try {
+            for (let i = 0; i < data.speakingOrder.queue.neg.length; i++) {
+                if (data.speakingOrder.queue.neg[i] != "None") {
+                    $("#neg-queue").append("<li>" + data.speakingOrder.queue.neg[i] + "</li>");
+                }
             }
-        }
+        } catch (err) {}
 
         // question card
-        $("#question-count").text(data.question.totalQuestions);
-        $("#question-last").text(data.question.lastQuestioner);
+        $("#question-count").text(session.total.questions);
+        $("#question-last").text(session.last.questioner);
 
         $("#question-queue").empty();
-        for (let i = 0; i < data.questionOrder.queue.length; i++) {
-            if (data.questionOrder.queue[i] != "None") {
-                $("#question-queue").append("<li>" + data.questionOrder.queue[i] + "</li>");
+        
+        try {
+            for (let i = 0; i < data.questionOrder.queue.length; i++) {
+                if (data.questionOrder.queue[i] != "None") {
+                    $("#question-queue").append("<li>" + data.questionOrder.queue[i] + "</li>");
+                }
             }
-        }
+        } catch (err) {}
 
         // Speaking order, precedence, and recency
-        $("#speaking-overall").empty();
-        for (let i = 0; i < data.speakingOrder.order.length; i++) {
-            $("#speaking-overall").append("<li>" + data.speakingOrder.order[i] + "</li>");
+        $("#speaking-order").empty();
+        for (let i = 0; i < session.speaking.order.length; i++) {
+            $("#speaking-order").append("<li>" + session.speaking.order[i] + "</li>");
         }
 
         $("#speaking-precedence").empty();
-        for (let i = 0; i < data.speakingOrder.precedence.length; i++) {
-            $("#speaking-precedence").append("<li>" + data.speakingOrder.precedence[i][0] + " " + data.speakingOrder.precedence[i][1] + "</li>");
+        for (let i = 0; i < session.speaking.precedence.length; i++) {
+            $("#speaking-precedence").append("<li>" + session.speaking.precedence[i][0] + " " + session.speaking.precedence[i][1] + "</li>");
         }
 
         $("#speaking-recency").empty();
-        for (let i = 0; i < data.speakingOrder.recency.length; i++) {
-            $("#speaking-recency").append("<li>" + data.speakingOrder.recency[i] + "</li>");
+        for (let i = 0; i < session.speaking.recency.length; i++) {
+            $("#speaking-recency").append("<li>" + session.speaking.recency[i] + "</li>");
         }
 
         // Question order, precedence, and recency
-        $("#question-overall").empty();
-        for (let i = 0; i < data.questionOrder.order.length; i++) {
-            $("#question-overall").append("<li>" + data.questionOrder.order[i] + "</li>");
+        $("#questioning-order").empty();
+        for (let i = 0; i < session.questioning.order.length; i++) {
+            $("#questioning-order").append("<li>" + session.questioning.order[i] + "</li>");
         }
 
-        $("#question-precedence").empty();
-        for (let i = 0; i < data.questionOrder.precedence.length; i++) {
-            $("#question-precedence").append("<li>" + data.questionOrder.precedence[i][0] + " " + data.questionOrder.precedence[i][1] + "</li>");
+        $("#questioning-precedence").empty();
+        for (let i = 0; i < session.questioning.precedence.length; i++) {
+            $("#questioning-precedence").append("<li>" + session.questioning.precedence[i][0] + " " + session.questioning.precedence[i][1] + "</li>");
         }
 
-        $("#question-recency").empty();
-        for (let i = 0; i < data.questionOrder.recency.length; i++) {
-            $("#question-recency").append("<li>" + data.questionOrder.recency[i] + "</li>");
+        $("#questioning-recency").empty();
+        for (let i = 0; i < session.questioning.recency.length; i++) {
+            $("#questioning-recency").append("<li>" + session.questioning.recency[i] + "</li>");
         }
     });
 }

@@ -85,7 +85,7 @@ app.get("/session/:sessionID", (req, res) => {
   res.send(session);
 });
 
-app.post("/update/:sessionID", (req3, res) => {
+app.post("/update/:sessionID", (req, res) => {
   session = req.body;
   console.log(session);
   utils.save(session);
