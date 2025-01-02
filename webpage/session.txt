@@ -1,0 +1,45 @@
+Session Object format:
+
+const session = {
+  "id": int,
+  "createdAt": Date
+  "currentMotion": string,
+  "currentSpeaker": {
+    "name": string,
+    "disposition": string,
+    "time": int,
+    "timePaused": bool,
+    "number": int
+  },
+  "speaking": {
+    "queue": {
+    "aff": string[],
+    "neg": string[]
+    },
+    "order": string[],
+    "precedence": [string[], int[]],
+    "recency": string[],
+  },
+  "questioning": {
+    "queue": string[],
+    "order": string[],
+    "precedence": [string[], int[]],
+    "recency": string[]
+  },
+  "last": {
+    "aff": {
+      "speaker": string,
+      "time": int
+    },
+    "neg": {
+      "speaker": string,
+      "time": int
+    },
+    "questioner": string
+  },
+  "total": {
+    "aff": int,
+    "neg": int,
+    "questions": int
+  }
+}
